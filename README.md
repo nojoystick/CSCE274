@@ -2,7 +2,7 @@
 
 Hi John and Curtis,
 
-Make an account on github if you don't already have one.
+To use this repository, make an account on github if you don't already have one.
 Then send me your username and I'll add  you to the repository as a collaborator.
 
 If you haven't used github from command line before, read this:
