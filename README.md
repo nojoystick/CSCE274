@@ -10,7 +10,7 @@ https://help.github.com/articles/adding-an-existing-project-to-github-using-the-
 
 
 You don't have to do step 1 because I already created the repository on github. Once you get to the "git remote add" step (6), you want to use this URL for the remote repository: 
-https://github.com/dallinw/CSCE274
+https://github.com/dallinw/CSCE274.git
 
 This will allow you to sync any work you do on your personal computer,
  so that it can be shared between all of us. 
