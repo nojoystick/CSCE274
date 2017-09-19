@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#Author: Dallin Williams
+#Date: 9.18.2017
+
 echo "ADDING NEW CHANGES TO INDEX"
 git add .
 echo "CREATE NEW COMMIT FROM INDEX"
