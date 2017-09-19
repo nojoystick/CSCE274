@@ -1,7 +1,7 @@
 # CSCE274
 
 To use this repository, make an account on github if you don't already have one.
-Then send me your username and I'll add  you to the repository as a collaborator.
+Then send me your username and I'll add  you to the repository as a collaborator. You'll also need to download Git.
 
 If you haven't used github from command line before, read this:
 https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/
