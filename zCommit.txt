@@ -1,9 +1,9 @@
 #!/bin/bash
 
-echo "Add changes to new branch"
+echo "ADDING NEW CHANGES TO INDEX"
 git add .
-echo "Commit changes"
+echo "CREATE NEW COMMIT FROM INDEX"
 git commit -a -m "Commit"
-echo "Push to Github"
+echo "PUSH CHANGES TO GITHUB"
 git push
 
