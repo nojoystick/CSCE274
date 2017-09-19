@@ -13,4 +13,8 @@ You don't have to do step 1 because I already created the repository on github. 
 https://github.com/dallinw/CSCE274.git
 
 This will allow you to sync any work you do on your personal computer,
- so that it can be shared between all of us. 
+so that it can be shared between all of us.
+
+Here's a demo from some guy online doing something somewhat similar to what we
+have to do. His code is in C++ but the examples seem like they might be useful:
+https://os.mbed.com/cookbook/iRobot-Create-Robot 
