@@ -1,0 +1,261 @@
+/*
+  bump_and_go.ino
+
+FROM http://web.ics.purdue.edu/~fwinkler/AD41700_F15/AD41700_Arduino_iRobot_workshop.pdf
+  
+  controls an iRobot Create robot with the Arduino board
+  with a basic obstacle avoidance behavior. Create bumps
+  into obstacles and navigates around them based on which
+  side of the bumper the obstacle was detected.
+
+*/
+
+
+#include <SoftwareSerial.h>
+
+ //* RX is digital pin 10 (connect to TX of other device - iRobot DB25 pin 2)
+ //* TX is digital pin 11 (connect to RX of other device - iRobot DB25 pin 1)
+#define rxPin 10
+#define txPin 11
+
+// set up a new software serial port:
+SoftwareSerial softSerial =  SoftwareSerial(rxPin, txPin);
+
+int val;
+int mySpeed; // a good speed seems to be between 150 and 200. Maximum is 500, minimum is 0. Negative values make the Create drive in reverse.
+
+int bumpLeft = 0;
+int bumpRight = 0;
+
+
+
+void setup() {   
+  delay(2000); // NEEDED!!!! To let the robot initialize 
+  
+  // define pin modes for software tx, rx pins:
+  pinMode(rxPin, INPUT);
+  pinMode(txPin, OUTPUT);
+  
+  // set the data rate for the SoftwareSerial port, this is the
+  // iRobot's default rae of 57600 baud:
+  softSerial.begin(57600);
+  Serial.begin(57600);
+  softSerial.write(128); // This command starts the OI. You must always send the Start command before sending any other commands to the OI
+  softSerial.write(131); // Go into save mode, i.e. whenever robot is picked up it stops (see p. 6 of Create's Open Interface documentation)
+     
+}
+
+void loop() {
+   
+  val = analogRead(0); //potentiometer connected to pin 0, value range 0-1023
+  mySpeed = map(val, 0, 1023, 0, 500); // map the value range from the potentiometer onto the speed.
+  BumpAndGo();
+  
+}
+  
+  // *********************************************************************
+  // ************** FUNCTIONS START HERE *********************************
+  // *********************************************************************
+  
+  // FUNCTIONS FOR DRIVING ********************************************************************
+
+void driveStraight(int velocity) {
+  byte cmd[] = {(byte) 137, 
+    (byte)highByte(velocity), 
+    (byte)lowByte(velocity), 
+                (byte)128,   // these are the bytes for the special case of driving straight
+                (byte)0};    // these are the bytes for the special case of driving straight
+    
+    for(int i=0; i < 5; i++) {
+      softSerial.write(cmd[i]);
+    }
+}
+
+void stopMoving() {
+  byte cmd[] = {(byte) 137, 
+    (byte)0, 
+    (byte)0, 
+    (byte)0,     // these are the bytes for the special case of stopping
+    (byte)0};    // these are the bytes for the special case of stopping
+    
+    for(int i=0; i < 5; i++) {
+      softSerial.write(cmd[i]);
+    }
+}
+
+void driveCurve(int velocity, int radius) {  //Velocity (-500 – 500 mm/s), Radius (-2000 – 2000 mm)
+  byte cmd[] = {(byte) 137, 
+    (byte)highByte(velocity), 
+    (byte)lowByte(velocity), 
+    (byte)highByte(radius),
+    (byte)lowByte(radius)};
+    
+    for(int i=0; i < 5; i++) {
+      softSerial.write(cmd[i]);
+    }
+}
+
+ void turnLeftinPlace(int velocity){
+  byte cmd[] = {(byte) 137, 
+    (byte)highByte(velocity), 
+    (byte)lowByte(velocity),
+    // special case: turn in place counter-clockwise = hex 0001
+    (byte) 0, 
+    (byte) 1}; 
+   
+    for(int i=0; i < 5; i++) {
+      softSerial.write(cmd[i]);
+    }
+ }
+
+ void turnRightinPlace(int velocity){
+  byte cmd[] = {(byte) 137, 
+    (byte)highByte(velocity), 
+    (byte)lowByte(velocity),
+    // special case: turn in place clockwise = hex FFFF
+    (byte) 255,
+    (byte) 255};
+    
+    for(int i=0; i < 5; i++) {
+      softSerial.write(cmd[i]);
+   }
+ }
+
+ 
+ // BUMP AND GO BEHAVIOR  *********************************************************
+ 
+void BumpAndGo() {
+  checkBumpSensors();
+  
+ if(bumpLeft) {
+    //Serial.println("bump left");
+    stopMoving();
+    delay(500);
+    driveStraight(-mySpeed); // go backward
+    delay(500); 
+    turnRightinPlace(mySpeed);
+    delay(300);
+    stopMoving();
+    delay(300); 
+  }
+
+  else if(bumpRight) {
+    //Serial.println("bump right");
+    stopMoving();
+    delay(500);
+    driveStraight(-mySpeed); // go backward
+    delay(500);
+    turnLeftinPlace(mySpeed);
+    delay(300);
+    stopMoving();
+    delay(300);
+  }
+  
+  else {
+  driveStraight(mySpeed);
+  }
+} 
+
+
+ // FUNCTION FOR CHECKING BUMP SENSORS *******************************************************
+
+ void checkBumpSensors() {
+  char sensorbytes[10]; // variable to hold the returned 10 bytes from iRobot Create
+  
+  softSerial.write((byte)142); // get sensor packets
+  softSerial.write((byte)1);  // sensor group packet ID 1, size 10 bytes, contains packets: 7-16
+  delay(64);
+
+  // wipe old sensor data
+  char i = 0;
+  while (i < 10) {
+    sensorbytes[i++] = 0;
+  }
+  i = 0;
+
+  while(softSerial.available()) {
+    int c = softSerial.read();
+    sensorbytes[i++] = c;
+  }
+  
+  bumpRight = sensorbytes[0] & 0x01; 
+  // if right bumper is triggered sensorbytes[0] is: 00000001
+  // bitwise AND with 0x01, i.e. 00000001 equals 1
+  // see: http://arduino.cc/en/Reference/BitwiseAnd 
+  bumpLeft = sensorbytes[0] & 0x02;  
+  // if left bumper is triggered sensorbytes[0] is: 00000010
+  // bitwise AND with 0x02, i.e. 00000010 equals 2
+  
+  // So if the right bumper is triggered bumpRight is 1 (if not triggered then 0)
+  // if the left bumper is triggered bumpLeft is 2 (if not triggered then 0)
+  
+  //Serial.print(bumpRight);
+  //Serial.print("   ");
+  //Serial.println(bumpLeft);
+}
+
+
+
+// FUNCTIONS FOR GETTING 16BIT SENSOR VALUES ***********************************************
+
+int getSensorValue(byte opcode, byte id) {
+  unsigned char sensorData[2];  
+  
+  // send bytes to iRobot Create to poll sensor data
+    softSerial.write(opcode); // opcode to select sensor packages
+    softSerial.write(id);  // specific package ID for battery charge
+    delay(64);
+    
+    // wipe old sensor data
+    int i = 0;
+    while (i < 2) {
+      sensorData[i] = 0;
+      i++;
+    }
+  
+    // now read new sensor data
+    i = 0;
+    while(softSerial.available()) {
+      sensorData[i] =  softSerial.read();
+      i++;
+    }
+    
+    int myInt = word(sensorData[0], sensorData[1]);   // The word(high,low) expression assembles a high and low byte into a 16-bit value
+    return myInt; 
+}
+
+
+
+
+// FUNCTION CHECKING ALL 4 LIFT SENSORS *******************************************************
+
+int isRobotLifted(){
+  int liftByte[4]; // bytes for all 4 lift sensors
+  
+  for (int i=0; i<4; i++) {
+    softSerial.write((byte)142);
+    softSerial.write((byte)9+i); // cliff sensors: 9 = cliff left, 10 = cliff front left, 11 = cliff front right, 12 = cliff right
+    delay(64);
+    liftByte[i] = 0;
+    if (softSerial.available() > 0) {
+     liftByte[i] = softSerial.read(); 
+    }
+  }
+  /*
+  Serial.print(liftByte[0]);
+  Serial.print("   ");
+  Serial.print(liftByte[1]);
+  Serial.print("   ");
+  Serial.print(liftByte[2]);
+  Serial.print("   ");
+  Serial.println(liftByte[3]);
+  */
+  // if only one of the lift sensors is triggered send back value 1
+  if (liftByte[0] == 1 || liftByte[1] == 1 || liftByte[2] == 1 || liftByte[3] == 1) {
+    return 1;
+   } else {  
+    return 0;   // if no lift sensors are triggered send back value 0
+  }
+}
+
+

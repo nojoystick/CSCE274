@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Add changes to new branch"
+git add .
+echo "Commit changes"
+git commit -a -m "Commit"
+echo "Push to Github"
+git push
+
