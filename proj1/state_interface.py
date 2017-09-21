@@ -1,3 +1,4 @@
+import serial
 #Control the state of the robot (Start, Reset, Stop, Passive, Safe).
 
 
