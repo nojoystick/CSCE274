@@ -1,6 +1,6 @@
 README.txt
 
-Header.pdf contains the required project submission information
+Header.pdf contains the required project submission information.
 
 connection_interface.py will contain the first interface required
 by the assignment. It connects to the serial interface, sends and
