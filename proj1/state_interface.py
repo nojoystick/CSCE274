@@ -30,9 +30,9 @@ import connection_interface
   
 # Commands relating to driving
   # radii for common commands
-  STRAIGHT = 0x8000
-  TURN_CLOCKWISE = 0xFFFF
-  TURN_COUNTERCLOCKWISE = 0x0001
+  STRAIGHT = "8000"
+  TURN_CLOCKWISE = "FFFF"
+  TURN_COUNTERCLOCKWISE = "0001"
   
   # Boundary conditions
   MAX_VELOCITY = 500
@@ -63,13 +63,8 @@ class Interface:
   # Send a Drive command to set the velocity and the radius of the
   # wheels, given the two as arguments.
   def drive(self, velocity, radius):
-    
+    v, r = self.drive_formatting(velocity, radius)
     # Convert velocity and radius into hex
-    velocity =  hex(velocity & (2**32-1))[2:] #returns 32 bit without 0x
-    radius = hex(radius & (2**32-1))[2:]
-    # Store velocity and radius hex in an array of bytes
-    v = bytearray(velocity)
-    r = bytearray(radius)
     connection.send_command("DRIVE_COMMAND v[0] v[1] r[0] r[1]")
   
   def drive_formatting(self, velocity, radius)
@@ -82,5 +77,13 @@ class Interface:
       radius = MAX_RADIUS
     if radius < MIN_RADIUS:
       radius = MIN_RADIUS
-  
-   
+    #format radius into hex
+    if radius != STRAIGHT and radius != TURN_CLOCKWISE and
+      radius != TURN_COUNTERCLOCKWISE:
+      #return radius as a 32 bit hex value w/out 0x
+      radius = hex(radius & (2**32-1))[2:]
+    velocity = hex(velocity & (2**32-1))[2:]
+    #now add to a byte array so individual bytes can be accessed
+    v = bytearray(velocity)
+    r = bytearray(radius)
+    return (v, r)
