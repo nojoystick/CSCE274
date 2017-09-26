@@ -27,7 +27,7 @@ class SerialInterface:
   #c. Reading of data.
   def read_data(self, size)
     #size should give the number of bytes
-    return self.connection.read(bytes)
+    return self.connection.read(size)
 
   #d. Close the connection.
   def close(self)

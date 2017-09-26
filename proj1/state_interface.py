@@ -3,7 +3,7 @@ import serial
 import connection_interface
 
 # Define a bunch of important constants
-# Right now there are global but later  on we
+# Right now these are global but later  on we
 # could organize them into classes
   port = "'/dev/ttyUSB0'"
   baudrate = 115200
@@ -46,30 +46,36 @@ class Interface:
 
   state = None
 
-  def init(self):
+  def __init__(self):
     # Set up serial connection
     self.connection = connection_interface.SerialInterface(port, baudrate)
-    #Change state to passive, then safe
+    # Change state to passive, then safe
     self.state = START
     self.control_state(SAFE)
-  #Control the state of the robot (Start, Reset, Stop, Passive, Safe).
+  # Control the state of the robot (Start, Reset, Stop, Passive, Safe).
   def control_state(self, next_state):
     if next_state != self.state:
       self.connection.write(chr(next_state))
  
   def read_buttons(self)
-    #TODO Read the state of the buttons
+    # TODO Read the state of the buttons
 
-  #Send a Drive command to set the velocity and the radius of the
-  #wheels, given the two as arguments.
+  # Send a Drive command to set the velocity and the radius of the
+  # wheels, given the two as arguments.
   def drive(self, velocity, radius):
-    #TODO THESE CONVERSIONS SHOULD BE THEIR OWN FUNCTION
-    #convert velocity and radius into hex
+    
+    # TODO THESE CONVERSIONS SHOULD BE THEIR OWN FUNCTION
+    # that function should check them against the maximums
+    # and account for some of the special values which don't
+    # need to be converted
+
+    # Convert velocity and radius into hex
     velocity =  hex(velocity & (2**32-1))[2:] #returns 32 bit without 0x
     radius = hex(radius & (2**32-1))[2:]
-    #store velocity and radius hex in an array of bytes
+    # Store velocity and radius hex in an array of bytes
     v = bytearray(velocity)
     r = bytearray(radius)
     connection.send_command("DRIVE_COMMAND v[0] v[1] r[0] r[1]")
   
-  
+  def drive_formatting(self, velocity, radius)
+    if velocity > MAX_VELOCITY
