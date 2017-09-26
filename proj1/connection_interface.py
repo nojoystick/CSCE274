@@ -1,16 +1,34 @@
 import serial
-#1. Write an interface for the serial communication, that includes:
 
-#a. Connection to the serial interface.
-connection = serial.Serial(‘/dev/ttyUSB0’, baudrate=115200);
+class SerialInterface:
+  #Some constants
+  port = "'/dev/ttyUSB0'"
+  baudrate = 115200
+  connection = None
+  
+  #Constructor
+  def __init__(self, port, baudrate):
+    self.connect(port,baudrate)
 
-#b. Sending of commands.
-#sends START command
-connection.write(chr(128));
+  #a. Connection to the serial interface.
+  def connect(self, port, baudrate): 
+    self.connection = serial.Serial(port, baudrate)
+  
+  #b. Sending of commands.
+  #this can take in a string of commands separated by spaces
+  #and split and encode the command
+  def send_command(self, command)
+    encoded = ""
+    command.split()
+    for index in range(len(command))
+      encoded += chr(int(index))
+    return self.connection.write(chr(encoded))
 
-#c. Reading of data.
-#reads 1 byte
-connection.read(1);
+  #c. Reading of data.
+  def read_data(self, size)
+    #size should give the number of bytes
+    return self.connection.read(bytes)
 
-#d. Close the connection.
-connection.close();
+  #d. Close the connection.
+  def close(self)
+    connection.close()

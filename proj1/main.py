@@ -1,5 +1,6 @@
 import serial
-#Write a program that utilizes the previous interfaces and:
+import connection_interface
+import state_interface
 
 
 #Initializes the robot, by setting it in passive and safe mode.
