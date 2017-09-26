@@ -64,11 +64,6 @@ class Interface:
   # wheels, given the two as arguments.
   def drive(self, velocity, radius):
     
-    # TODO THESE CONVERSIONS SHOULD BE THEIR OWN FUNCTION
-    # that function should check them against the maximums
-    # and account for some of the special values which don't
-    # need to be converted
-
     # Convert velocity and radius into hex
     velocity =  hex(velocity & (2**32-1))[2:] #returns 32 bit without 0x
     radius = hex(radius & (2**32-1))[2:]
@@ -78,4 +73,14 @@ class Interface:
     connection.send_command("DRIVE_COMMAND v[0] v[1] r[0] r[1]")
   
   def drive_formatting(self, velocity, radius)
-    if velocity > MAX_VELOCITY
+  # check boundaries 
+    if velocity > MAX_VELOCITY:
+      velocity = MAX_VELOCITY
+    if velocity < MIN VELOCITY:
+      velocity = MIN_VELOCITY
+    if radius > MAX_RADIUS:
+      radius = MAX_RADIUS
+    if radius < MIN_RADIUS:
+      radius = MIN_RADIUS
+  
+   
