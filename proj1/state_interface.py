@@ -1,4 +1,5 @@
 import serial
+import struct
 
 import connection_interface
 
@@ -7,7 +8,7 @@ import connection_interface
 # could organize them into classes
   port = "'/dev/ttyUSB0'"
   baudrate = 115200
-
+  SENSORS_OPCODE = "142"
 # Values relating to state
   START = "128"
   RESET = "7"
@@ -27,6 +28,7 @@ import connection_interface
   CLEAN = 0x01
 
   PACKET = "18"
+  DATA_SIZE = "1" # in bytes
   
 # Commands relating to driving
   # radii for common commands
@@ -58,7 +60,28 @@ class Interface:
       self.connection.write(chr(next_state))
  
   def read_buttons(self)
-    # TODO Read the state of the buttons
+    # Read packet
+    self.connection.send_command(SENSORS_OPCODE+" "+PACKET)
+    button_data = self.connection.read_data(DATA_SIZE)
+    # Check that size of input matches expected size
+    if len(button_data) == DATA_SIZE:
+      byte = struct.unpack('B', button_data)[0]
+      return {
+        CLEAN: bool(byte & CLEAN)
+        SPOT: bool(byte & SPOT)
+        DOCK: bool(byte & DOCK)
+        MINUTE: bool(byte & MINUTE)
+        HOUR: bool(byte & HOUR)
+        DAY: bool(byte & DAY)
+        SCHEDULE: bool(byte & SCHEDULE)
+        CLOCK: bool(byte & CLOCk)
+        }
+    # If there's a data size mismatch
+    else:
+      return {
+        CLEAN: False, SPOT: False, DOCK: False, MINUTE: False,
+        HOUR: False, DAY: False, SCHEDULE: False, CLOCK: False
+        }
 
   # Send a Drive command to set the velocity and the radius of the
   # wheels, given the two as arguments.
@@ -66,9 +89,10 @@ class Interface:
     v, r = self.drive_formatting(velocity, radius)
     # Convert velocity and radius into hex
     connection.send_command("DRIVE_COMMAND v[0] v[1] r[0] r[1]")
-  
+    
+    
   def drive_formatting(self, velocity, radius)
-  # check boundaries 
+  # Check boundary conditions
     if velocity > MAX_VELOCITY:
       velocity = MAX_VELOCITY
     if velocity < MIN VELOCITY:
@@ -77,11 +101,11 @@ class Interface:
       radius = MAX_RADIUS
     if radius < MIN_RADIUS:
       radius = MIN_RADIUS
-    #format radius into hex
+    # Format radius into hex
     if radius != STRAIGHT and radius != TURN_CLOCKWISE and
       radius != TURN_COUNTERCLOCKWISE:
-      #return radius as a 32 bit hex value w/out 0x
-      radius = hex(radius & (2**32-1))[2:]
+      # Return radius as a 32 bit hex value w/out 0x
+      raddius = hex(radius & (2**32-1))[2:]
     velocity = hex(velocity & (2**32-1))[2:]
     #now add to a byte array so individual bytes can be accessed
     v = bytearray(velocity)
