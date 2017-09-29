@@ -6,43 +6,43 @@ import connection_interface
 # Define a bunch of important constants
 # Right now these are global but later  on we
 # could organize them into classes
-  port = "'/dev/ttyUSB0'"
-  baudrate = 115200
-  SENSORS_OPCODE = "142"
+port = '/dev/ttyUSB0'
+baudrate = 115200
+SENSORS_OPCODE = 142
 # Values relating to state
-  START = "128"
-  RESET = "7"
-  STOP = "173"
-  SAFE = "131"
-  FULL = "132"
+START = 128
+RESET = 7
+STOP = 173
+SAFE = 131
+FULL = 132
 
 # Values relating to buttons
   # These are the read values from the OI Spec
-  CLOCK = 0x80
-  SCHEDULE = 0x40
-  DAY = 0x20
-  HOUR = 0x10
-  MINUTE = 0x08
-  DOCK = 0x04
-  SPOT = 0x02
-  CLEAN = 0x01
+CLOCK = 0x80
+SCHEDULE = 0x40
+DAY = 0x20
+HOUR = 0x10
+MINUTE = 0x08
+DOCK = 0x04
+SPOT = 0x02
+CLEAN = 0x01
 
-  PACKET = "18"
-  DATA_SIZE = "1" # in bytes
+PACKET = "18"
+DATA_SIZE = "1" # in bytes
   
 # Commands relating to driving
   # radii for common commands
-  STRAIGHT = "8000"
-  TURN_CLOCKWISE = "FFFF"
-  TURN_COUNTERCLOCKWISE = "0001"
+STRAIGHT = "8000"
+TURN_CLOCKWISE = "FFFF"
+TURN_COUNTERCLOCKWISE = "0001"
   
   # Boundary conditions
-  MAX_VELOCITY = 500
-  MIN_VELOCITY = -500
-  MAX_RADIUS = 2000
-  MIN_RADIUS = -2000
+MAX_VELOCITY = 500
+MIN_VELOCITY = -500
+MAX_RADIUS = 2000
+MIN_RADIUS = -2000
 
-  DRIVE_COMMAND = "137"
+DRIVE_COMMAND = 137
 
 class Interface:
 
@@ -70,13 +70,13 @@ class Interface:
       byte = struct.unpack('B', button_data)[0]
       return {
       #if this doesnt work change Globals to binary
-        CLEAN: bool(byte & CLEAN)
-        SPOT: bool(byte & SPOT)
-        DOCK: bool(byte & DOCK)
-        MINUTE: bool(byte & MINUTE)
-        HOUR: bool(byte & HOUR)
-        DAY: bool(byte & DAY)
-        SCHEDULE: bool(byte & SCHEDULE)
+        CLEAN: bool(byte & CLEAN),
+        SPOT: bool(byte & SPOT),
+        DOCK: bool(byte & DOCK),
+        MINUTE: bool(byte & MINUTE),
+        HOUR: bool(byte & HOUR),
+        DAY: bool(byte & DAY),
+        SCHEDULE: bool(byte & SCHEDULE),
         CLOCK: bool(byte & CLOCk)
         }
     # If there's a data size mismatch
@@ -93,21 +93,21 @@ class Interface:
     # Convert velocity and radius into hex
     #connection.send_command("DRIVE_COMMAND v[0] v[1] r[0] r[1]")
     #unsure about above
-    connection.send_command(DRIVE_COMMAND+v[0]+v[1]+r[0]+r[1])
+    command = str(DRIVE_COMMAND+v[0]+v[1]+r[0]+r[1])
+    connection.send_command(command)
     
   def drive_formatting(self, velocity, radius):
   # Check boundary conditions
     if velocity > MAX_VELOCITY:
       velocity = MAX_VELOCITY
-    if velocity < MIN VELOCITY:
+    if velocity < MIN_VELOCITY:
       velocity = MIN_VELOCITY
     if radius > MAX_RADIUS:
       radius = MAX_RADIUS
     if radius < MIN_RADIUS:
       radius = MIN_RADIUS
     # Format radius into hex
-    if radius != STRAIGHT and radius != TURN_CLOCKWISE and
-      radius != TURN_COUNTERCLOCKWISE:
+    if radius != STRAIGHT and radius != TURN_CLOCKWISE and radius != TURN_COUNTERCLOCKWISE:
       # Return radius as a 32 bit hex value w/out 0x
       raddius = hex(radius & (2**32-1))[2:]
     velocity = hex(velocity & (2**32-1))[2:]

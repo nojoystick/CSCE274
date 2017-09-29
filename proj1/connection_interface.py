@@ -22,22 +22,22 @@ class SerialInterface:
   #b. Sending of commands.
   #this can take in a string of commands separated by spaces
   #and split and encode the command
-  def send_command(self, command)
-    #encoded = ""
-    #command.split()
-    #for index in range(len(command))
-    #  encoded += chr(int(index))
-    #return self.connection.write(chr(encoded))
+  def send_command(self, command):
+    encoded = ""
+    command.split()
+    for index in range(len(command))
+      encoded += chr(int(index))
+    return self.connection.write(chr(int(encoded)))
     
     #Friend who got all projects working said this is all you need.
-    self.connection.write(command)
+    #self.connection.write(command)
     sleep(.015) #Must wait 15 ms in between command sends.
 
   #c. Reading of data.
-  def read_data(self, size)
+  def read_data(self, size):
     #size should give the number of bytes
     return self.connection.read(size)
 
   #d. Close the connection.
-  def close(self)
+  def close(self):
     connection.close()
