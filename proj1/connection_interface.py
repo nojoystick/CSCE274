@@ -1,4 +1,5 @@
 import serial
+from time import sleep
 
 class SerialInterface:
   #Some constants
@@ -9,6 +10,10 @@ class SerialInterface:
   #Constructor
   def __init__(self, port, baudrate):
     self.connect(port,baudrate)
+    #Should close and reopen connection because of weirdness in values upon init
+    self.connection.close()
+    sleep(.015)
+    self.connection.open()
 
   #a. Connection to the serial interface.
   def connect(self, port, baudrate): 
@@ -18,11 +23,15 @@ class SerialInterface:
   #this can take in a string of commands separated by spaces
   #and split and encode the command
   def send_command(self, command)
-    encoded = ""
-    command.split()
-    for index in range(len(command))
-      encoded += chr(int(index))
-    return self.connection.write(chr(encoded))
+    #encoded = ""
+    #command.split()
+    #for index in range(len(command))
+    #  encoded += chr(int(index))
+    #return self.connection.write(chr(encoded))
+    
+    #Friend who got all projects working said this is all you need.
+    self.connection.write(command)
+    sleep(.015) #Must wait 15 ms in between command sends.
 
   #c. Reading of data.
   def read_data(self, size)

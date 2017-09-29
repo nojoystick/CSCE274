@@ -1,11 +1,13 @@
 import serial
 import connection_interface
 import state_interface
+import threading
 
+def myThread():
+	t = threading.Thread(target=GO)
 
 #Initializes the robot, by setting it in passive and safe mode.
-
-
+connect.stat_interface.Interface()
 #If the robot is stopped, once the clean/power button is pressed, move counterclockwise along a regular pentagon with 30 cm sides. The robot stops once the pentagon is covered.
 #Wheel diameter is 72 cm
 #each pentagon angle is 108 deg

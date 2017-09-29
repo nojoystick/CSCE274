@@ -54,19 +54,22 @@ class Interface:
     # Change state to passive, then safe
     self.state = START
     self.control_state(SAFE)
+
   # Control the state of the robot (Start, Reset, Stop, Passive, Safe).
   def control_state(self, next_state):
     if next_state != self.state:
-      self.connection.write(chr(next_state))
+      #self.connection.write(chr(next_state)) For consistency lets use send_command
+      self.connection.send_command(next_state)
  
-  def read_buttons(self)
+  def read_buttons(self):
     # Read packet
-    self.connection.send_command(SENSORS_OPCODE+" "+PACKET)
+    self.connection.send_command(SENSORS_OPCODE+PACKET) #This should work fine im told.
     button_data = self.connection.read_data(DATA_SIZE)
     # Check that size of input matches expected size
     if len(button_data) == DATA_SIZE:
       byte = struct.unpack('B', button_data)[0]
       return {
+      #if this doesnt work change Globals to binary
         CLEAN: bool(byte & CLEAN)
         SPOT: bool(byte & SPOT)
         DOCK: bool(byte & DOCK)
@@ -88,10 +91,11 @@ class Interface:
   def drive(self, velocity, radius):
     v, r = self.drive_formatting(velocity, radius)
     # Convert velocity and radius into hex
-    connection.send_command("DRIVE_COMMAND v[0] v[1] r[0] r[1]")
+    #connection.send_command("DRIVE_COMMAND v[0] v[1] r[0] r[1]")
+    #unsure about above
+    connection.send_command(DRIVE_COMMAND+v[0]+v[1]+r[0]+r[1])
     
-    
-  def drive_formatting(self, velocity, radius)
+  def drive_formatting(self, velocity, radius):
   # Check boundary conditions
     if velocity > MAX_VELOCITY:
       velocity = MAX_VELOCITY
