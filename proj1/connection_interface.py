@@ -25,7 +25,7 @@ class SerialInterface:
   def send_command(self, command):
     encoded = ""
     command.split()
-    for index in range(len(command))
+    for index in range(len(command)):
       encoded += chr(int(index))
     return self.connection.write(chr(int(encoded)))
     

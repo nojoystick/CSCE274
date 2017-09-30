@@ -88,16 +88,14 @@ class Interface:
 
   # Send a Drive command to set the velocity and the radius of the
   # wheels, given the two as arguments.
+
   def drive(self, velocity, radius):
-    v, r = self.drive_formatting(velocity, radius)
-    # Convert velocity and radius into hex
-    #connection.send_command("DRIVE_COMMAND v[0] v[1] r[0] r[1]")
-    #unsure about above
-    command = str(DRIVE_COMMAND+v[0]+v[1]+r[0]+r[1])
-    connection.send_command(command)
-    
+    v1, v2, r1, r2 =self.drive_formatting(velocity, radius)
+    command = str(DRIVE_COMMAND)+" "+str(v1)+" "+str(v2)+" "+str(r1)+" "+str(r2)
+    self.connection.send_command(command)
+
   def drive_formatting(self, velocity, radius):
-  # Check boundary conditions
+  Check boundary conditions
     if velocity > MAX_VELOCITY:
       velocity = MAX_VELOCITY
     if velocity < MIN_VELOCITY:
@@ -109,9 +107,15 @@ class Interface:
     # Format radius into hex
     if radius != STRAIGHT and radius != TURN_CLOCKWISE and radius != TURN_COUNTERCLOCKWISE:
       # Return radius as a 32 bit hex value w/out 0x
-      raddius = hex(radius & (2**32-1))[2:]
-    velocity = hex(velocity & (2**32-1))[2:]
-    #now add to a byte array so individual bytes can be accessed
-    v = bytearray(velocity)
-    r = bytearray(radius)
-    return (v, r)
+      velocity = hex(velocity & (2**16-1))[2:]
+      radius = hex(radius & (2**16-1))[2:]
+    # store as a 4 character string
+    velocity = str(velocity).zfill(4)
+    radius = str(radius).zfill(4)
+    # parse low and high bit back into decimal
+    v1 = int(velocity[:2],16)
+    v2 = int(velocity[2:],16)
+    r1= int(radius[:2],16)
+    r2= int(radius[2:],16)
+
+    return (v1,v2,r1,r2)

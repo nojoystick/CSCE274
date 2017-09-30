@@ -2,11 +2,10 @@
 
 #Author: Dallin Williams
 #Date: 9.18.2017
-
 echo "ADDING NEW CHANGES TO INDEX"
 git add .
 echo "CREATE NEW COMMIT FROM INDEX"
-git commit -a -m "Commit"
+git commit -a -m "$*"
 echo "PUSH CHANGES TO GITHUB"
 git push
 
