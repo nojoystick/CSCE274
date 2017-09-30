@@ -24,11 +24,10 @@ class SerialInterface:
   #and split and encode the command
   def send_command(self, command):
     encoded = ""
-    command.split()
-    for index in range(len(command)):
-      encoded += chr(int(index))
-    return self.connection.write(chr(int(encoded)))
-    
+    command = str.split(command)
+    for i in range(0,len(command)):
+      encoded += chr(int(command[i]))
+    self.connection.write(encoded)
     #Friend who got all projects working said this is all you need.
     #self.connection.write(command)
     sleep(.015) #Must wait 15 ms in between command sends.
