@@ -119,3 +119,9 @@ class Interface:
     r2= int(radius[2:],16)
 
     return (v1,v2,r1,r2)
+
+  def close(self):
+    self.connection.close()
+
+  def stop(self)
+    self.drive(0,0)

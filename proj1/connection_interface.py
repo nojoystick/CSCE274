@@ -39,4 +39,4 @@ class SerialInterface:
 
   #d. Close the connection.
   def close(self):
-    connection.close()
+    self.connection.close()
