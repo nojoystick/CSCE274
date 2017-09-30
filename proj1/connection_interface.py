@@ -3,7 +3,7 @@ from time import sleep
 
 class SerialInterface:
   #Some constants
-  port = "'/dev/ttyUSB0'"
+  port = '/dev/ttyUSB0'
   baudrate = 115200
   connection = None
   
