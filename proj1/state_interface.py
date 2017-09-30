@@ -8,13 +8,13 @@ import connection_interface
 # could organize them into classes
 port = '/dev/ttyUSB0'
 baudrate = 115200
-SENSORS_OPCODE = 142
+SENSORS_OPCODE = "142"
 # Values relating to state
-START = 128
-RESET = 7
-STOP = 173
-SAFE = 131
-FULL = 132
+START = "128"
+RESET = "7"
+STOP = "173"
+SAFE = "131"
+FULL = "132"
 
 # Values relating to buttons
   # These are the read values from the OI Spec
@@ -42,7 +42,7 @@ MIN_VELOCITY = -500
 MAX_RADIUS = 2000
 MIN_RADIUS = -2000
 
-DRIVE_COMMAND = 137
+DRIVE_COMMAND = "137"
 
 class Interface:
 
