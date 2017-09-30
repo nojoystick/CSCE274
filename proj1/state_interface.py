@@ -60,11 +60,18 @@ class Interface:
     if next_state != self.state:
       #self.connection.write(chr(next_state)) For consistency lets use send_command
       self.connection.send_command(next_state)
+
+  def read_button(self, button):
+    self.read_packet(self, PACKET, DATA_SIZE)
+    if len(data)==DATA_SIZE:
+      byte = struct.unpack("B", data)[0]
+      return bool(byte & button)
+    else:
+      return False  
  
   def read_buttons(self):
     # Read packet
-    self.connection.send_command(SENSORS_OPCODE+PACKET) #This should work fine im told.
-    button_data = self.connection.read_data(DATA_SIZE)
+    button_data = self.read_packet(self, PACKET, DATA_SIZE)
     # Check that size of input matches expected size
     if len(button_data) == DATA_SIZE:
       byte = struct.unpack('B', button_data)[0]
@@ -85,6 +92,10 @@ class Interface:
         CLEAN: False, SPOT: False, DOCK: False, MINUTE: False,
         HOUR: False, DAY: False, SCHEDULE: False, CLOCK: False
         }
+
+  def read_packet(self, packet_id, data_size):
+    self.connection.send_command(SENSORS_OPCODE+PACKET)
+    return self.connection.read_data(DATA_SIZE)
 
   # Send a Drive command to set the velocity and the radius of the
   # wheels, given the two as arguments.
@@ -125,3 +136,4 @@ class Interface:
 
   def stop(self)
     self.drive(0,0)
+
