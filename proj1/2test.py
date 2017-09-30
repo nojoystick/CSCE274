@@ -23,19 +23,39 @@ def start_control():
     if connection.read_button(connection.CLEAN):
       pentagon().start()
 
-def pentagon(threading.Thread):
-  
-  for i in range(0,5):
-    time = straightTime(200,32)
-    connection.drive(200,0)
-    sleep(time)
+class pentagon(threading.Thread):
+  def __init__(self):
+    threading.Thread.__init__(self)
+    self.iterations = 0
+    self.daemon=True
+    self.paused=True
+    self.state=threading.Condition()
 
-  time = turnTime(200,1.225)
-  connection.drive(200, -1)
-  sleep(time)
+  def run(self):
+    self.resume()
+    while True:
+      for i in range(0,5):
+        time = straightTime(200,32)
+        connection.drive(200,0)
+        sleep(time)
+
+        time = turnTime(200,1.225)
+        connection.drive(200, -1)
+        sleep(time)
+
+  def reumse(self):
+    with self.state:
+      self.paused=False
+      self.state.notify()
+
+  def pause(self):
+    with self.state:
+      self.paused=True
 
 start_control()
 connection.stop()
 connection.close()
+
+
 
 
