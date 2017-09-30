@@ -95,7 +95,7 @@ class Interface:
     self.connection.send_command(command)
 
   def drive_formatting(self, velocity, radius):
-  Check boundary conditions
+  #Check boundary conditions
     if velocity > MAX_VELOCITY:
       velocity = MAX_VELOCITY
     if velocity < MIN_VELOCITY:
