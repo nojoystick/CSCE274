@@ -62,7 +62,10 @@ class Interface:
       self.connection.send_command(next_state)
 
   def read_button(self, button):
-    self.read_packet(self, PACKET, DATA_SIZE)
+    #self.read_packet(self, PACKET, DATA_SIZE)
+    
+    self.connection.send_command(str(SENSORS_OPCODE)+" "+str(PACKET))
+    data = self.connection.read_data(DATA_SIZE)
     if len(data)==DATA_SIZE:
       byte = struct.unpack("B", data)[0]
       return bool(byte & button)
@@ -134,6 +137,9 @@ class Interface:
   def close(self):
     self.connection.close()
 
-  def stop(self)
+  def stop(self):
     self.drive(0,0)
 
+  def getClean(self):
+    print ("Clean value is ",self.CLEAN)
+    return self.CLEAN

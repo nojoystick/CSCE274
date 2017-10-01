@@ -20,7 +20,8 @@ def turnTime(velocity, angle):
 def start_control():
   connection = state_interface.Interface()
   while True:
-    if connection.read_button(connection.CLEAN):
+    if connection.read_button(connection.getClean):
+      print "almost at pentagon"
       pentagon().start()
 
 class pentagon(threading.Thread):

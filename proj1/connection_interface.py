@@ -30,12 +30,12 @@ class SerialInterface:
     self.connection.write(encoded)
     #Friend who got all projects working said this is all you need.
     #self.connection.write(command)
-    sleep(.015) #Must wait 15 ms in between command sends.
+    #sleep(.015) #Must wait 15 ms in between command sends.
 
   #c. Reading of data.
   def read_data(self, size):
     #size should give the number of bytes
-    return self.connection.read(size)
+    return self.connection.read(int(size))
 
   #d. Close the connection.
   def close(self):

@@ -1,4 +1,5 @@
 import serial
+import threading
 import state_interface
 import connection_interface
 from time import sleep
@@ -14,13 +15,15 @@ def turnTime(velocity, angle):
   return time
 
 connection = state_interface.Interface()
+#background = threading.Thread(connection)
+
 for i in range(0,5):
   time = straightTime(200,32)
   connection.drive(200,0)
   sleep(time)
 
-  time = turnTime(200,1.225)
-  connection.drive(200, -1)
+  time = turnTime(200,1.2265)
+  connection.drive(200, 1)
   sleep(time)
 
 connection.stop()
