@@ -1,5 +1,8 @@
 import serial
 import struct
+from time import sleep
+from threading import Lock
+lock = Lock()
 
 import connection_interface
 
@@ -28,7 +31,7 @@ SPOT = 0x02
 CLEAN = 0x01
 
 PACKET = "18"
-DATA_SIZE = "1" # in bytes
+DATA_SIZE = 1 # in bytes
   
 # Commands relating to driving
   # radii for common commands
@@ -62,16 +65,21 @@ class Interface:
       self.connection.send_command(next_state)
 
   def read_button(self, button):
+    #print button
     #self.read_packet(self, PACKET, DATA_SIZE)
-    
+    #lock.acquire()   
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(PACKET))
+    #sleep(0.015)
     data = self.connection.read_data(DATA_SIZE)
+    #lock.release()
+    #print "data is "
+    #print data
     if len(data)==DATA_SIZE:
       byte = struct.unpack("B", data)[0]
       return bool(byte & button)
     else:
       return False  
- 
+
   def read_buttons(self):
     # Read packet
     button_data = self.read_packet(self, PACKET, DATA_SIZE)
@@ -141,5 +149,5 @@ class Interface:
     self.drive(0,0)
 
   def getClean(self):
-    print ("Clean value is ",self.CLEAN)
-    return self.CLEAN
+    #print ("Clean value is ",CLEAN)
+    return CLEAN

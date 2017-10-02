@@ -1,5 +1,6 @@
 import serial
 from time import sleep
+import struct
 
 c = serial.Serial('/dev/ttyUSB0', 115200)
 sleep(0.015)
@@ -13,5 +14,8 @@ while True:
   sleep(0.015)
   data = c.read(1)
   print data
-  if data == "0x80":
+  byte = struct.unpack('B', data)[0]
+  if bool(byte & 0x01):
     print "Clean this dick."
+    break
+
