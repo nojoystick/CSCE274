@@ -7,6 +7,17 @@ import threading;
 L = 235 #distance wheels are apart in mm
 #connection = ""
 
+global DONE 
+DONE = False
+global moving 
+moving = False
+global VERTEXES 
+VERTEXES = 5
+global TOTAL 
+TOTAL = 0
+global CURRENT 
+CURRENT= 0
+
 def straightTime(velocity, distance):
   time = (float(distance*10))/float(velocity)
   return time
@@ -53,16 +64,17 @@ def turnTime(velocity, angle):
   #  with self.state:
    #   self.paused=True
 
-DONE = False
-moving = False
-VERTEXES = 5
-TOTAL = 0
-CURRENT = 0
-
 def pentagon():
+  global moving
+  global VERTEXES
+  global CURRENT
+  global TOTAL
+
   while moving:
     CURRENT = 0
+    #connection.stop()
     for i in range(VERTEXES-TOTAL):
+      connection.pause()
       time = straightTime(200,32)
       connection.drive(200,0)
       sleep(time)
@@ -71,7 +83,10 @@ def pentagon():
       connection.drive(200,1)
       sleep(time)
       CURRENT = CURRENT+1
-  #TOTAL = CURRENT
+    moving = False  
+    print moving
+  connection.stop()
+#TOTAL = CURRENT
 
 connection = state_interface.Interface()
 
