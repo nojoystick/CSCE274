@@ -87,11 +87,11 @@ while not DONE:
       TOTAL = CURRENT
       moving = False
       connection.stop()
-    sleep(0.015)
+    connection.pause()
   elif TOTAL is 5:
     myThread.stop()
     break
-  sleep(0.015)
+  connection.pause()
 
 connection.stop()
 connection.close()

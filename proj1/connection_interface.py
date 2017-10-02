@@ -12,7 +12,7 @@ class SerialInterface:
     self.connect(port,baudrate)
     #Should close and reopen connection because of weirdness in values upon init
     self.connection.close()
-    sleep(.015)
+    self.pause()
     self.connection.open()
 
   #a. Connection to the serial interface.
@@ -31,7 +31,7 @@ class SerialInterface:
     self.connection.write(encoded)
     #Friend who got all projects working said this is all you need.
     #self.connection.write(command)
-    sleep(.015) #Must wait 15 ms in between command sends.
+    self.pause() #Must wait 15 ms in between command sends.
 
   #c. Reading of data.
   def read_data(self, size):
@@ -41,3 +41,6 @@ class SerialInterface:
   #d. Close the connection.
   def close(self):
     self.connection.close()
+  
+  def pause():
+    sleep(0.015)

@@ -80,6 +80,8 @@ class Interface:
     else:
       return False  
 
+# We should keep this for future projects but we
+# can take it out of here because we don't need it for this one
   def read_buttons(self):
     # Read packet
     button_data = self.read_packet(self, PACKET, DATA_SIZE)
@@ -151,3 +153,6 @@ class Interface:
   def getClean(self):
     #print ("Clean value is ",CLEAN)
     return CLEAN
+
+  def pause():
+    sleep(0.015)
