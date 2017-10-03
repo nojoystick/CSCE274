@@ -5,8 +5,9 @@ import time
 import threading;
 
 L = 235 #distance wheels are apart in mm
-#connection = ""
 
+# We should figure out how to make this prettier
+# I suspect we can take the globals out
 global DONE 
 DONE = False
 global moving 
@@ -20,7 +21,9 @@ CURRENT= 0
 global PRESS
 PRESS = False
 
-
+# Functions to calculate drive times needed
+# to travel a specific distance or turn a 
+# specific angle
 def straightTime(velocity, distance):
   time = (float(distance*10))/float(velocity)
   return time
@@ -29,43 +32,6 @@ def turnTime(velocity, angle):
   omega = float(2*velocity)/float(L)
   drive_time = angle/omega
   return drive_time
-
-#def start_control():
- # connection = state_interface.Interface()
-  #while True:
-    #print connection.read_button(CLEAN)
-   # if connection.read_button(connection.getClean()):
-    #  print "almost at pentagon"
-     # pentagon().start()
-
-#class pentagon(threading.Thread):
- # def __init__(self):
-  #  threading.Thread.__init__(self)
-   # self.iterations = 0
-    #self.daemon=True
-    #self.paused=True
-    #self.state=threading.Condition()
-
-  #def run(self):
-   # self.resume()
-    #while True:
-     # for i in range(0,5):
-      #  time = straightTime(200,32)
-       # connection.drive(200,0)
-        #sleep(time)
-
-        #time = turnTime(200,1.225)
-        #connection.drive(200, -1)
-        #sleep(time)
-
-  #def reumse(self):
-    #with self.state:
-     # self.paused=False
-      #self.state.notify()
-
- # def pause(self):
-  #  with self.state:
-   #   self.paused=True
 
 def pentagon():
   global moving
@@ -76,7 +42,8 @@ def pentagon():
 
   while moving:
     CURRENT = 0
-    #connection.stop()
+    # We should see if it still works when we take out
+    # the clock stuff
     for i in range(VERTEXES-TOTAL):
       clock = 0
       connection.pause()
@@ -91,11 +58,9 @@ def pentagon():
       isTurning = True
       clock = time.clock()
       time.sleep(drive_time)
-      print("HI HI")
       TOTAL+=1
       if PRESS:
         connection.pause()
-        print("BITCH")
         clock2 = time.clock()
         rem_time = clock2-clock
         if not isTurning:
@@ -107,9 +72,7 @@ def pentagon():
         break
       connection.pause()
     moving = False  
-    print moving
     connection.stop()
-#TOTAL = CURRENT
 
 connection = state_interface.Interface()
 
@@ -127,7 +90,6 @@ while not DONE:
       print "B"
       PRESS = True
       moving = False
-      #connection.stop()
     connection.pause()
   elif TOTAL is 5:
     print "C"
