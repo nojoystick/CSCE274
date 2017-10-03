@@ -1,7 +1,7 @@
 import serial
 import state_interface
 import connection_interface
-from time import sleep
+import time
 import threading;
 
 L = 235 #distance wheels are apart in mm
@@ -17,6 +17,9 @@ global TOTAL
 TOTAL = 0
 global CURRENT 
 CURRENT= 0
+global PRESS
+PRESS = False
+
 
 def straightTime(velocity, distance):
   time = (float(distance*10))/float(velocity)
@@ -24,8 +27,8 @@ def straightTime(velocity, distance):
 
 def turnTime(velocity, angle):
   omega = float(2*velocity)/float(L)
-  time = angle/omega
-  return time
+  drive_time = angle/omega
+  return drive_time
 
 #def start_control():
  # connection = state_interface.Interface()
@@ -69,42 +72,65 @@ def pentagon():
   global VERTEXES
   global CURRENT
   global TOTAL
+  global PRESS
 
   while moving:
     CURRENT = 0
     #connection.stop()
     for i in range(VERTEXES-TOTAL):
+      clock = 0
       connection.pause()
-      time = straightTime(200,32)
+      drive_time = straightTime(200,32)
       connection.drive(200,0)
-      sleep(time)
+      isTurning = False
+      clock = time.clock()
+      time.sleep(drive_time)
 
-      time = turnTime(200,1.2265)
+      drive_time = turnTime(200,1.2265)
       connection.drive(200,1)
-      sleep(time)
-      CURRENT = CURRENT+1
+      isTurning = True
+      clock = time.clock()
+      time.sleep(drive_time)
+      print("HI HI")
+      TOTAL+=1
+      if PRESS:
+        connection.pause()
+        print("BITCH")
+        clock2 = time.clock()
+        rem_time = clock2-clock
+        if not isTurning:
+          connection.drive(200,0)
+        if isTurning:
+          connection.drive(200,1)
+        time.sleep(rem_time)
+        PRESS = False
+        break
+      connection.pause()
     moving = False  
     print moving
-  connection.stop()
+    connection.stop()
 #TOTAL = CURRENT
 
 connection = state_interface.Interface()
 
 while not DONE:
+  connection.pause()
   ret = connection.read_button(connection.getClean())
+  connection.pause()
   if ret:
     if not moving:
-      TOTAL = CURRENT
+      print "A"
       myThread = threading.Thread(target=pentagon)
       moving = True
       myThread.start()
     else:
-      TOTAL = CURRENT
+      print "B"
+      PRESS = True
       moving = False
       connection.stop()
     connection.pause()
   elif TOTAL is 5:
-    myThread.stop()
+    print "C"
     break
   connection.pause()
 
