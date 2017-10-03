@@ -154,5 +154,5 @@ class Interface:
     #print ("Clean value is ",CLEAN)
     return CLEAN
 
-  def pause():
+  def pause(self):
     sleep(0.015)

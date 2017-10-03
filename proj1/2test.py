@@ -127,7 +127,7 @@ while not DONE:
       print "B"
       PRESS = True
       moving = False
-      connection.stop()
+      #connection.stop()
     connection.pause()
   elif TOTAL is 5:
     print "C"

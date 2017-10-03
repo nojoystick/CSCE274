@@ -42,5 +42,5 @@ class SerialInterface:
   def close(self):
     self.connection.close()
   
-  def pause():
+  def pause(self):
     sleep(0.015)
