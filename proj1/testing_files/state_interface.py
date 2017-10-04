@@ -1,6 +1,8 @@
 import serial
 import struct
 from time import sleep
+from threading import Lock
+lock = Lock()
 
 import connection_interface
 

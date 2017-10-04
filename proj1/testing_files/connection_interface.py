@@ -1,12 +1,16 @@
 import serial
 from time import sleep
 
-#Some constants
+# Had to move these up here in order for them to be recognized globally for some reason?
 port = '/dev/ttyUSB0'
 baudrate = 115200
 connection = None
-
 class SerialInterface:
+  # Some constants
+  #global port = '/dev/ttyUSB0'
+  #baudrate = 115200
+  #connection = None
+  
   # Constructor
   def __init__(self):
     self.connect(port, baudrate)
