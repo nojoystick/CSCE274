@@ -157,7 +157,7 @@ class Interface:
   def pause(self):
     sleep(0.015)
   
-  def pause(self, time):
+  def pause(time):
     sleep(time)
 
 #****** READING DATA FROM THE ROBOT *******************************************#
@@ -192,6 +192,7 @@ class Interface:
     data = self.connection.read_data(DATA_SIZE)
     if len(data) == DATA_SIZE:
       byte = struct.unpack("B", data)[0]
+      wheel_drop = False
       if bool(byte & DROP_LEFT) or bool(byte & DROP_RIGHT):
         wheel_drop = True
       bump_left = bool(byte & BUMP_LEFT)
