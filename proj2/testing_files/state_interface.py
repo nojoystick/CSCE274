@@ -307,36 +307,38 @@ class Interface:
 
   def drive_formatting(self, r_vel, l_vel):
     # Check boundary conditions
+    print str(r_vel) + "start"
     r_vel = check_boundary(r_vel, MAX_VELOCITY, MIN_VELOCITY)
     l_vel = check_boundary(l_vel, MAX_VELOCITY, MIN_VELOCITY)
-    # Hexify into a 4 bit string of hex
+   # Hexify into a 4 bit string of hex
+    print str(r_vel)
     r_vel = hexify(r_vel)
-    l_vel = hexify(l_vel
+    l_vel = hexify(l_vel)
     # Split into two low and high bits and parse those back into decimal
     vr1, vr2, vl1, vl2 = split_bits(r_vel,l_vel)
-    command = stringify(DIRECT_COMMAND, vr1,vr2,vr3,vr4)
+    command = stringify(DIRECT_COMMAND, vr1,vr2,vl1,vl2)
     return command
 
   # HELPER FUNCTIONS CALLED BY DRIVE FORMATTING #
   def check_boundary(param, max_bound, min_bound):
     if param > max_bound:
       param = max_bound
-    if param < min_bound
+    if param < min_bound:
       param = min_bound
     return param
   
   def hexify(param):
     param = hex(param & (2**16-1))[2:]
-    return param
     param = str(param).zfill(4)
+    return param
   
-   def split_bits(param1, param2):
-     high1 = int(param1[:2],16) 
-     high2 = int(param2[:2],16)
-     low1 = int(param[2:],16) 
-     low2 = int(param2[2:],16)
-     return (high1, low1, high2, low2)
+  def split_bits(param1, param2):
+    high1 = int(param1[:2],16) 
+    high2 = int(param2[:2],16)
+    low1 = int(param[2:],16) 
+    low2 = int(param2[2:],16)
+    return (high1, low1, high2, low2)
 
-   def stringify(opcode, p1, p2, p3, p4):
-     command = (str(opcode)+" "+str(p1)+" "+str(
+  def stringify(opcode, p1, p2, p3, p4):
+    command = (str(opcode)+" "+str(p1)+" "+str(
                p2)+" "+str(p3)+" "+str(p4))
