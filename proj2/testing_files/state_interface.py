@@ -72,14 +72,27 @@ FRONT_RIGHT = 11
 VIRTUAL_WALL = 13
 
   
-#********* SENDING DATA *************** ***************************************#
+#********* SENDING DATA *******************************************************#
 #
-#  
+#  Data for sending commands to the robot, including driving and song 
+#  information.  
 #
-#
+#******************************************************************************#
 
 
 # Song ************************************************************************#
+SONG_COMMAND = 140
+SONG_NUMBER = 1
+SONG_LENGTH = 12
+A_SHARP = 70
+F_SHARP = 66
+D_SHARP = 63
+DOT_QUART = 48
+QUARTER = 32
+EIGHTH = 16
+SIXTEENTH = 8 
+
+
 
 # Driving *********************************************************************#
 STRAIGHT = "8000"
@@ -143,6 +156,9 @@ class Interface:
 
   def pause(self):
     sleep(0.015)
+  
+  def pause(self, time):
+    sleep(time)
 
 #****** READING DATA FROM THE ROBOT *******************************************#
 #
@@ -186,12 +202,11 @@ class Interface:
 
   
   def read_cliff(self):
-    sensors_list = "L","L", "R", "R"
     for i in range(0,4):
       self.connection.send_command(str(SENSORS_OPCODE)+" "+str(LEFT+i))
       data = self.connection.read_data(DATA_SIZE)
       byte = struct.unpack("B", data)[0]
-      return (bool(byte & CLIFF), sensors_list[i])
+      return bool(byte & CLIFF)
       
     
   def getClean(self):
@@ -247,6 +262,13 @@ class Interface:
 #******************************************************************************#
 
   def song(self):
+    command = str(SONG_COMMAND)+" "+str(SONG_NUMBER)+" "+str(
+              SONG_LENGTH)+" "+str(As)+" "+str(E)+" "+str(Fs)+" "+str(
+              Q)+" "+str(Fs)+" "+str(S)+" "+str(Ds)+" "+str(S)+" "+str(
+              Fs)+" "+str(E)+" "+str(Fs)+" "+str(Q)+" "+str(Fs)+" "+str(
+              S)+" "+str(Ds)+" "+str(S)+" "+str(Fs)+" "+str(E)+" "+str(
+              Fs)+" "+str(Q)+" "+str(Fs)+" "+str(Q)+" "+str(As)+" "+str(DQ)
+    connection.send_command(command)
     
 
   def straightTime(velocity,distance): 
