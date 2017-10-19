@@ -3,7 +3,7 @@ import struct
 from time import sleep
 from threading import Lock
 import connection_interface
-
+L = 235
 #************ STATE ****************** ****************************************#
 #
 #  Various opcodes for controlling the state of the robot. These can be passed
@@ -84,13 +84,13 @@ VIRTUAL_WALL = 13
 SONG_COMMAND = 140
 SONG_NUMBER = 1
 SONG_LENGTH = 12
-A_SHARP = 70
-F_SHARP = 66
-D_SHARP = 63
-DOT_QUART = 48
-QUARTER = 32
-EIGHTH = 16
-SIXTEENTH = 8 
+As = 70
+Fs = 66
+Ds = 63
+DQ = 48
+Q = 32
+E = 16
+S = 8 
 
 
 
@@ -157,7 +157,7 @@ class Interface:
   def pause(self):
     sleep(0.015)
   
-  def pause(time):
+  def tpause(self,time):
     sleep(time)
 
 #****** READING DATA FROM THE ROBOT *******************************************#
@@ -272,14 +272,14 @@ class Interface:
               Fs)+" "+str(E)+" "+str(Fs)+" "+str(Q)+" "+str(Fs)+" "+str(
               S)+" "+str(Ds)+" "+str(S)+" "+str(Fs)+" "+str(E)+" "+str(
               Fs)+" "+str(Q)+" "+str(Fs)+" "+str(Q)+" "+str(As)+" "+str(DQ)
-    connection.send_command(command)
+    self.connection.send_command(command)
     
 
-  def straightTime(velocity,distance): 
+  def straightTime(self,velocity,distance): 
     time = (float(distance*10))/float(velocity)
     return time
 
-  def turnTime(velocity, angle):
+  def turnTime(self, velocity, angle):
     omega = float(2*velocity)/float(L)
     time = angle/omega
     return time
@@ -297,52 +297,51 @@ class Interface:
 
   def drive_formatting(self, velocity, radius):
     # Check boundary conditions
-    check_boundary(velocity, MAX_VELOCITY, MIN_VELOCITY)
-    check_boundary(radius, MAX_RADIUS, MIN_RADIUS)
-    velocity = hexify(velocity)
+    velocity = self.check_boundary(velocity, MAX_VELOCITY, MIN_VELOCITY)
+    radius = self.check_boundary(radius, MAX_RADIUS, MIN_RADIUS)
+    velocity = self.hexify(velocity)
     # If it isn't already hex, format the radius into hex
     if radius != STRAIGHT and radius != TURN_CLOCKWISE \
        and radius != TURN_COUNTERCLOCKWISE:
-      radius = hexify(radius)
+      radius = self.hexify(radius)
     # Parse low and high bit back into decimal
-    v1,v2,r1,r2 = split_bits(velocity,radius)
-    command = stringify(DRIVE_COMMAND, v1,v2,r1,r2)
+    v1,v2,r1,r2 = self.split_bits(velocity,radius)
+    command = self.stringify(DRIVE_COMMAND, v1,v2,r1,r2)
     return command
 
   def drive_formatting(self, r_vel, l_vel):
     # Check boundary conditions
-    print str(r_vel) + "start"
-    r_vel = check_boundary(r_vel, MAX_VELOCITY, MIN_VELOCITY)
-    l_vel = check_boundary(l_vel, MAX_VELOCITY, MIN_VELOCITY)
+    r_vel = self.check_boundary(r_vel, MAX_VELOCITY, MIN_VELOCITY)
+    l_vel = self.check_boundary(l_vel, MAX_VELOCITY, MIN_VELOCITY)
    # Hexify into a 4 bit string of hex
-    print str(r_vel)
-    r_vel = hexify(r_vel)
-    l_vel = hexify(l_vel)
+    r_vel = self.hexify(r_vel)
+    l_vel = self.hexify(l_vel)
     # Split into two low and high bits and parse those back into decimal
-    vr1, vr2, vl1, vl2 = split_bits(r_vel,l_vel)
-    command = stringify(DIRECT_COMMAND, vr1,vr2,vl1,vl2)
+    vr1, vr2, vl1, vl2 = self.split_bits(r_vel,l_vel)
+    command = self.stringify(DIRECT_COMMAND, vr1,vr2,vl1,vl2)
     return command
 
   # HELPER FUNCTIONS CALLED BY DRIVE FORMATTING #
-  def check_boundary(param, max_bound, min_bound):
+  def check_boundary(self,param, max_bound, min_bound):
     if param > max_bound:
       param = max_bound
     if param < min_bound:
       param = min_bound
     return param
   
-  def hexify(param):
+  def hexify(self,param):
     param = hex(param & (2**16-1))[2:]
     param = str(param).zfill(4)
     return param
   
-  def split_bits(param1, param2):
+  def split_bits(self,param1, param2):
     high1 = int(param1[:2],16) 
     high2 = int(param2[:2],16)
-    low1 = int(param[2:],16) 
+    low1 = int(param1[2:],16) 
     low2 = int(param2[2:],16)
     return (high1, low1, high2, low2)
 
-  def stringify(opcode, p1, p2, p3, p4):
-    command = (str(opcode)+" "+str(p1)+" "+str(
-               p2)+" "+str(p3)+" "+str(p4))
+  def stringify(self,opcode, p1, p2, p3, p4):
+    command = str((str(opcode)+" "+str(p1)+" "+str(
+               p2)+" "+str(p3)+" "+str(p4)))
+    return command
