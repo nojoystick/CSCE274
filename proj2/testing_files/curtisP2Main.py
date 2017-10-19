@@ -19,54 +19,61 @@ def randomAngle(low, high):
 def randomDirection():
   return random.randint(0,1)
 
+# Function that tells the robot to turn clockwise for 180 + (-30,30) degrees
+def turnClockwise():
+  connection.drive(200,1)
+  connection.pause(connection.turnTime(200, (TURNANG + randomAngle(LOWANG, HIGHAND))))
+
+# Function that tells the robot to turn counterclockwise for 180 + (-30,30) degrees
+def turnCounterClockwise():
+  connection.drive(200,-1)
+  connection.pause(connection.turnTime(200, (TURNANG + randomAngle(LOWANG, HIGHANG))))
+  
 def cantStopWontStop():
   global MOVING
-  global LOWANG
-  global HIGHANG
-  global TURNANG
 
   while MOVING:
   	connection.pause()
-    #connection. direct drive 200,200?
+    connection.drive_direct(200,200)
     connection.pause()
-    #wheelDrop,bumpLeft,bumpRight = connection. read wheelDrop sesor
+    wheelDrop,bumpLeft,bumpRight = connection.bump_wheel_drop()
     connection.pause()
-    #cliffLeft, cliffFrontLeft, cliffFrontRight, cliffRight  = connection. read cliff sensors
+    cliffLeft, cliffFrontLeft, cliffFrontRight, cliffRight = connection.read_cliff()
     connection.pause()
 
-    #if wheelDrop:
-      #connection.stop()
+    if wheelDrop:
+      connection.stop()
       connection.pause()
-      #connection. play warning song
+      #connection.song()
       connection.pause()
-      #MOVING = False
-      #break
-    #elif ((cliffLeft or cliffFrontLeft) and (cliffRight or cliffFrontRight)) or cliffVWall
-      #if randomDirection() == 0:
-        #turn clockwise TURNANG + randomAngle(LOWANG, HIGHANG)
+      MOVING = False
+      break
+    elif ((cliffLeft or cliffFrontLeft) and (cliffRight or cliffFrontRight)):
+      if randomDirection() == 0:
+        turnClockwise()
         connection.pause()
-      #else
-        #turn counter clockwise TURNANG + randomAngle(LOWANG, HIGHANG)
+      else
+        turnCounterClockwise()
         connection.pause()
-    #elif cliffLeft or cliffFrontLeft
-      #turn clockwise TURNANG + randomAngle(LOWANG, HIGHANG)
+    elif cliffLeft or cliffFrontLeft
+      turnClockwise()
+      connection.pause()
+    elif cliffRight or cliffFrontRight
+      turnCounterClockwise()
+      connection.pause()
+    elif bumpLeft and bumpRight:
+      if randomDirection() == 0
+        turnClockwise()
         connection.pause()
-    #elif cliffRight or cliffFrontRight
-      #turn counter clockwise TURNANG + randomAngle(LOWANG, HIGHANG)
+      else
+        turnCounterClockwise()
         connection.pause()
-    #elif bumpLeft and bumpRight:
-      #if randomDirection() == 0
-        #turn clockwise TURNANG + randomAngle(LOWANG, HIGHANG)
-        connection.pause()
-      #else
-          #turn counter clockwise TURNANG + randomAngle(LOWANG, HIGHANG)
-          connection.pause()
-	#elif bumpLeft:
-      #turn clockwise TURNANG + randomAngle(LOWANG, HIGHANG)
-        connection.pause()
-    #elif bumpRight:
-      #turn counter clockwise TURNANG + randomAngle(LOWANG,HIGHANG)
-        connection.pause()
+	elif bumpLeft:
+      turnClockwise()
+      connection.pause()
+    elif bumpRight:
+      turnCounterClockwise()
+      connection.pause()
 
 connection = state_interface.Interface()
 #connection.set_Full()
@@ -75,16 +82,16 @@ while True:
   connection.pause()
   cleanDetect = connection.read_button(connection.getClean())
   connection.pause()
-  #wheelDrop = connection. read wheelDrop sensor
+  wheelDrop, bumpLeft, bumpRight = connection.bump_wheel_drop()
   connection.pause()
-  #cliffDetect = connection. read Cliff Sensors
+  cliffLeft, cliffFrontLeft, cliffFrontRight, cliffRight = connection.read_cliff()
   connection.pause()
 
-  if not MOVING:#and not wheelDrop and not cliffDetect and cleanDetect:
+  if not MOVING and not wheelDrop and not (cliffLeft or cliffFrontLeft or cliffFrontRight or cliffRight) and cleanDetect:
     myThread = threading.Thread(target=cantStopWontStop)
     MOVING = True
     myThread.start()
-  elif MOVING:#and cleanDetect
+  elif MOVING and cleanDetect:
     MOVING = False
     connection.pause()
 
