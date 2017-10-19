@@ -313,7 +313,7 @@ class Interface:
     r_vel = hexify(r_vel)
     l_vel = hexify(l_vel
     # Split into two low and high bits and parse those back into decimal
-    vr1,vr2,vl1,vl2 = split_bits(r_vel,l_vel)
+    vr1, vr2, vl1, vl2 = split_bits(r_vel,l_vel)
     command = stringify(DIRECT_COMMAND, vr1,vr2,vr3,vr4)
     return command
 
@@ -331,9 +331,11 @@ class Interface:
     param = str(param).zfill(4)
   
    def split_bits(param1, param2):
-     high1,high2 =  (int(param1[:2],16), int(param2[:2:],16))
-     low1,low2 = (int(param1[2:],16), int(param2[2:],16))
-     return high1,low1,high2,low2
+     high1 = int(param1[:2],16) 
+     high2 = int(param2[:2],16)
+     low1 = int(param[2:],16) 
+     low2 = int(param2[2:],16)
+     return (high1, low1, high2, low2)
 
    def stringify(opcode, p1, p2, p3, p4):
      command = (str(opcode)+" "+str(p1)+" "+str(

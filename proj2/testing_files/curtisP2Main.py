@@ -33,7 +33,7 @@ def cantStopWontStop():
   global MOVING
 
   while MOVING:
-  	connection.pause()
+    connection.pause()
     connection.drive_direct(200,200)
     connection.pause()
     wheelDrop,bumpLeft,bumpRight = connection.bump_wheel_drop()
@@ -52,23 +52,23 @@ def cantStopWontStop():
       if randomDirection() == 0:
         turnClockwise()
         connection.pause()
-      else
+      else:
         turnCounterClockwise()
         connection.pause()
-    elif cliffLeft or cliffFrontLeft
+    elif cliffLeft or cliffFrontLeft:
       turnClockwise()
       connection.pause()
-    elif cliffRight or cliffFrontRight
+    elif cliffRight or cliffFrontRight:
       turnCounterClockwise()
       connection.pause()
     elif bumpLeft and bumpRight:
-      if randomDirection() == 0
+      if randomDirection() == 0:
         turnClockwise()
         connection.pause()
-      else
+      else:
         turnCounterClockwise()
         connection.pause()
-	elif bumpLeft:
+    elif bumpLeft:
       turnClockwise()
       connection.pause()
     elif bumpRight:
