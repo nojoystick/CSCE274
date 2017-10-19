@@ -204,10 +204,13 @@ class Interface:
   
   def read_cliff(self):
     for i in range(0,4):
-      self.connection.send_command(str(SENSORS_OPCODE)+" "+str(LEFT+i))
-      data = self.connection.read_data(DATA_SIZE)
-      byte = struct.unpack("B", data)[0]
-      return bool(byte & CLIFF)
+      self.connection.send_command(str(SENSORS_OPCODE)+" "+str(LEFT))
+      self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
+      self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
+      self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
+      data = self.connection.read_data(4) #read 4 bytes
+      byte = struct.unpack("I", data)[0]
+      return byte
       
     
   def getClean(self):
