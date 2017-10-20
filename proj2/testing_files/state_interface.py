@@ -197,8 +197,10 @@ class Interface:
         wheel_drop = True
       bump_left = bool(byte & BUMP_LEFT)
       bump_right = bool(byte & BUMP_RIGHT)
+      print "Returning actual values."
       return (wheel_drop, bump_right, bump_left)
     else:
+      print "Returning all Falses."
       return (False, False, False)
 
   
