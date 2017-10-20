@@ -1,5 +1,6 @@
 import serial
 import struct
+import math
 from time import sleep
 from threading import Lock
 import connection_interface
@@ -154,6 +155,7 @@ class Interface:
 
   def stop(self):
     self.drive(0,0)
+    self.drive_direct(0,0)
 
   def pause(self):
     sleep(0.015)
@@ -284,6 +286,7 @@ class Interface:
     return time
 
   def turnTime(self, velocity, angle):
+    angle = math.radians(angle))
     omega = float(2*velocity)/float(L)
     time = angle/omega
     return time
