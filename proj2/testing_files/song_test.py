@@ -1,4 +1,5 @@
 import serial
+import time
 connection = serial.Serial('/dev/ttyUSB0',115200)
 
 SONG_COMMAND = 140
@@ -17,8 +18,8 @@ def send_command(command):
     command = str.split(command)
     for i in range(0,len(command)):
       encoded += chr(int(command[i]))
-    self.connection.write(encoded)
-    self.pause()
+    connection.write(encoded)
+    time.sleep(0.015)
 
 def song():
   command = str(SONG_COMMAND)+" "+str(SONG_NUMBER)+" "+str(
@@ -28,3 +29,6 @@ def song():
               S)+" "+str(Ds)+" "+str(S)+" "+str(Fs)+" "+str(E)+" "+str(
               Fs)+" "+str(Q)+" "+str(Fs)+" "+str(Q)+" "+str(As)+" "+str(DQ)
   send_command(command)
+  send_command(str(141) + " " + str(1))
+
+song()
