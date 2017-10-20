@@ -82,7 +82,8 @@ VIRTUAL_WALL = 13
 
 # Song ************************************************************************#
 SONG_COMMAND = 140
-SONG_NUMBER = 1
+PLAY_COMMAND = 141
+SONG_NUMBER = 0
 SONG_LENGTH = 12
 As = 70
 Fs = 66
@@ -205,14 +206,13 @@ class Interface:
 
   
   def read_cliff(self):
-    for i in range(0,4):
-      self.connection.send_command(str(SENSORS_OPCODE)+" "+str(LEFT))
-      self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
-      self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
-      self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
-      data = self.connection.read_data(4) #read 4 bytes
-      byte = struct.unpack("I", data)[0]
-      return byte
+    self.connection.send_command(str(SENSORS_OPCODE)+" "+str(LEFT))
+    self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
+    self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
+    self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
+    data = self.connection.read_data(4) #read 4 bytes
+    byte = struct.unpack("I", data)[0]
+    return byte
       
     
   def getClean(self):
@@ -274,6 +274,8 @@ class Interface:
               Fs)+" "+str(E)+" "+str(Fs)+" "+str(Q)+" "+str(Fs)+" "+str(
               S)+" "+str(Ds)+" "+str(S)+" "+str(Fs)+" "+str(E)+" "+str(
               Fs)+" "+str(Q)+" "+str(Fs)+" "+str(Q)+" "+str(As)+" "+str(DQ)
+    self.connection.send_command(command)
+    command = str(PLAY_COMMAND)+" "+str(SONG_NUMBER)
     self.connection.send_command(command)
     
 
