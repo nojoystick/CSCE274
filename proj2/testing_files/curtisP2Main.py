@@ -17,26 +17,37 @@ def randomAngle(low, high):
 # which direction the roomba should rotate. 0 indicates turn left, 
 # 1 indicates turn right.
 def randomDirection():
+  print "in random direction"
   return random.randint(0,1)
 
 # Function that tells the robot to turn clockwise for 180 + (-30,30) degrees
 def turnClockwise():
+  print "in clockwise turn"
   connection.drive(200,1)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
+  print str(totalAngle)
   waitTime = connection.turnTime(200, totalAngle)
+  print str(waitTime)
   connection.tpause(waitTime)
 
 # Function that tells the robot to turn counterclockwise for 180 + (-30,30) degrees
 def turnCounterClockwise():
+  print "in cc turn"
   connection.drive(200,-1)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
+  print str(totalAngle)
   waitTime = connection.turnTime(200, totalAngle)
+  print str(waitTime)
   connection.tpause(waitTime)
   
 def cantStopWontStop():
   global MOVING
 
   while MOVING:
+    wheelDrop = False
+    bumpLeft = False
+    bumpRight = False
+    cliff = 0
     print "In CSWT while loop"
     connection.pause()
     connection.drive_direct(200,200)
@@ -100,6 +111,7 @@ connection = state_interface.Interface()
 connection.song()
 print "Started moving"
 while True: 
+  #print "in infinite loop"
   connection.pause()
   cleanDetect = connection.read_button(connection.getClean())
   connection.pause()
@@ -115,11 +127,10 @@ while True:
 
   if not MOVING and not wheelDrop and cliff==0 and cleanDetect: #(cliffLeft or cliffFrontLeft or cliffFrontRight or cliffRight) and cleanDetect:
     myThread = threading.Thread(target=cantStopWontStop)
-    print "In not moving"
+    #print "In not moving"
     MOVING = True
     myThread.start()
   elif MOVING and cleanDetect:
-    print "In moving"
     MOVING = False
     connection.pause()
 
