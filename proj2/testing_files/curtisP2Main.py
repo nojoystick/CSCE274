@@ -132,6 +132,7 @@ while True:
     myThread.start()
   elif MOVING and cleanDetect:
     MOVING = False
+    connection.stop()
     connection.pause()
 
   connection.pause()
