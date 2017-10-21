@@ -2,8 +2,9 @@ import serial
 import struct
 import math
 from time import sleep
-from threading import Lock
+from threading import Thread, Lock
 import connection_interface
+lock = Lock()
 L = 235
 #************ STATE ****************** ****************************************#
 #
@@ -154,6 +155,7 @@ class Interface:
     self.connection.close()
 
   def stop(self):
+    print "Stopping"
     self.drive(0,0)
     self.drive_direct(0,0)
 
@@ -182,38 +184,36 @@ class Interface:
 #******************************************************************************#
   
   def read_button(self, button):
+    lock.acquire()
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(BUTTONS_PACKET))
     data = self.connection.read_data(DATA_SIZE)
-    if len(data)==DATA_SIZE:
-      byte = struct.unpack("B", data)[0]
-      return bool(byte & button)
-    else:
-      return False  
+    byte = struct.unpack("B", data)[0]
+    lock.release()
+    return bool(byte & button)
   
   def bump_wheel_drop(self):
+    lock.acquire()
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(BUMP_PACKET))
     data = self.connection.read_data(DATA_SIZE)
-    if len(data) == DATA_SIZE:
-      byte = struct.unpack("B", data)[0]
-      wheel_drop = False
-      if bool(byte & DROP_LEFT) or bool(byte & DROP_RIGHT):
-        wheel_drop = True
-      bump_left = bool(byte & BUMP_LEFT)
-      bump_right = bool(byte & BUMP_RIGHT)
-      print "Returning actual values."
-      return (wheel_drop, bump_right, bump_left)
-    else:
-      print "Returning all Falses."
-      return (False, False, False)
+    byte = struct.unpack("B", data)[0]
+    wheel_drop = False
+    if bool(byte & DROP_LEFT) or bool(byte & DROP_RIGHT):
+      wheel_drop = True
+    bump_left = bool(byte & BUMP_LEFT)
+    bump_right = bool(byte & BUMP_RIGHT)
+    lock.release()
+    return (wheel_drop, bump_right, bump_left)
 
   
   def read_cliff(self):
+    lock.acquire()
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(LEFT))
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
     data = self.connection.read_data(4) #read 4 bytes
     byte = struct.unpack("I", data)[0]
+    lock.release()
     return byte
       
     
@@ -286,7 +286,7 @@ class Interface:
     return time
 
   def turnTime(self, velocity, angle):
-    angle = math.radians(angle))
+    angle = float(math.radians(angle))
     omega = float(2*velocity)/float(L)
     time = angle/omega
     return time

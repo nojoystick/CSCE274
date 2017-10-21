@@ -23,7 +23,7 @@ def randomDirection():
 # Function that tells the robot to turn clockwise for 180 + (-30,30) degrees
 def turnClockwise():
   print "in clockwise turn"
-  connection.drive(200,1)
+  connection.drive_direct(200,-200)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
   print str(totalAngle)
   waitTime = connection.turnTime(200, totalAngle)
@@ -33,7 +33,7 @@ def turnClockwise():
 # Function that tells the robot to turn counterclockwise for 180 + (-30,30) degrees
 def turnCounterClockwise():
   print "in cc turn"
-  connection.drive(200,-1)
+  connection.drive_direct(-200,200)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
   print str(totalAngle)
   waitTime = connection.turnTime(200, totalAngle)
@@ -107,7 +107,7 @@ def cantStopWontStop():
       connection.pause()
 
 connection = state_interface.Interface()
-#connection.set_Full()
+connection.set_full()
 connection.song()
 print "Started moving"
 while True: 
