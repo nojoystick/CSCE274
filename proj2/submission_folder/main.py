@@ -1,69 +1,94 @@
 import state_interface
-import time
 import threading
-import math
+import random
 
 #Global Constants
-MOVING = False #Robots current state
-VERTEXES = 5 #Total number of vertexes the robot should hit
-TOTAL = 0 #How many vertexes the robot has hit
-ANGLE = 72 #Pentagons angle in degrees
-DISTANCE = 320 #Length of each pentagons side in mm
-L = 235 #distance wheels are apart in mm
+MOVING = False # Is the robot currently moving
+LOWANG = -30 # Lowest number in range
+HIGHANG = 30 # Highest number in range
+TURNANG = 180 # Default angle for robot to turn when it bumbs/detects a cliff
+SPEED = 100 # Speed to use for all robot movements
 
-# Functions to calculate drive times needed
-# to travel a specific distance or turn a 
-# specific angle
+# Function randomAngle takes in two integers in a range from low to high 
+# and generates a random number N such that low <= N <= high
+def randomAngle(low, high):
+  return random.randint(low, high)
 
-def straightTime(velocity, distance):
-  time = (float(distance))/float(velocity)
-  return time
+# Function randomDirection generates either 0 or 1 to determine 
+# which direction the roomba should rotate. 0 indicates turn left, 
+# 1 indicates turn right.
+def randomDirection():
+  print "in random direction"
+  return random.randint(0,1)
 
-def turnTime(velocity, angle):
-  angle = float(math.radians(angle)) #Convert angle to radians
-  omega = float(2*velocity)/float(L)
-  drive_time = angle/omega
-  return drive_time
+# Function that tells the robot to turn clockwise for 180 + (-30,30) degrees
+def turnClockwise():
+  connection.drive_direct(SPEED,-SPEED)
+  totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
+  waitTime = connection.turnTime(SPEED, totalAngle)
+  connection.tpause(waitTime)
 
-def pentagon():
+# Function that tells the robot to turn counterclockwise for 180 + (-30,30) degrees
+def turnCounterClockwise():
+  connection.drive_direct(-SPEED,SPEED)
+  totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
+  waitTime = connection.turnTime(SPEED, totalAngle)
+  connection.tpause(waitTime)
+  
+def cantStopWontStop():
   global MOVING
-  global VERTEXES
-  global TOTAL
 
   while MOVING:
-    for i in range(VERTEXES-TOTAL):
-      connection.pause()
-      drive_time = straightTime(200,DISTANCE)
-      connection.drive(200,0)
-      time.sleep(drive_time)
+    wheelDrop = False
+    bumpLeft = False
+    bumpRight = False
+    cliff = 0
+    connection.drive_direct(SPEED,SPEED)
+    wheelDrop,bumpLeft,bumpRight = connection.bump_wheel_drop()
+    #cliffLeft, cliffFrontLeft, cliffFrontRight, cliffRight = connection.read_cliff()
+    cliff = connection.read_cliff()
 
-      drive_time = turnTime(200,ANGLE)
-      connection.drive(200,1)
-      time.sleep(drive_time)
-      TOTAL+=1
-      if not MOVING:
-        connection.stop()
-        break
-      connection.pause()
-    MOVING = False
+    if wheelDrop:
+      connection.stop()
+      connection.song())
+      MOVING = False
+      break
+    elif cliff != 0: #((cliffLeft or cliffFrontLeft) and (cliffRight or cliffFrontRight)):
+      connection.stop()
+      if randomDirection() == 0:
+        turnClockwise()
+      else:
+        turnCounterClockwise()
+    #elif cliffLeft or cliffFrontLeft:
+     # turnClockwise()
+    #elif cliffRight or cliffFrontRight:
+     # turnCounterClockwise()
+    elif bumpLeft and bumpRight:
+      connection.stop()
+      if randomDirection() == 0:
+        turnClockwise()
+      else:
+        turnCounterClockwise()
+    elif bumpLeft:
+      connection.stop()
+      turnClockwise()
+    elif bumpRight:
+      connection.stop()
+      turnCounterClockwise()
 
 connection = state_interface.Interface()
-
+connection.set_full()
+connection.song()
 while True: 
-  connection.pause()
-  ret = connection.read_button(connection.getClean())
-  connection.pause()
-  if ret:
-    if not MOVING:
-      myThread = threading.Thread(target=pentagon)
-      MOVING = True
-      myThread.start()
-    else:
-      MOVING = False
-    connection.pause()
-  elif TOTAL is 5:
-    break
-  connection.pause()
+  cleanDetect = connection.read_button(connection.getClean())
+  wheelDrop, bumpLeft, bumpRight = connection.bump_wheel_drop()
+  #cliffLeft, cliffFrontLeft, cliffFrontRight, cliffRight = connection.read_cliff()
+  cliff = connection.read_cliff()
 
-connection.stop()
-connection.close()
+  if not MOVING and not wheelDrop and cliff==0 and cleanDetect: #(cliffLeft or cliffFrontLeft or cliffFrontRight or cliffRight) and cleanDetect:
+    myThread = threading.Thread(target=cantStopWontStop)
+    MOVING = True
+    myThread.start()
+  elif MOVING and cleanDetect:
+    MOVING = False
+    connection.stop()

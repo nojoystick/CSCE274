@@ -1,12 +1,12 @@
 import serial
 from time import sleep
 
-#Some constants
+# Global Constants
 port = '/dev/ttyUSB0'
 baudrate = 115200
 connection = None
-
 class SerialInterface:
+  
   # Constructor
   def __init__(self):
     self.connect(port, baudrate)
