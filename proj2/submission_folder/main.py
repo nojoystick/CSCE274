@@ -1,6 +1,7 @@
 import state_interface
 import threading
 import random
+import logging
 
 #Global Constants
 MOVING = False # Is the robot currently moving
@@ -8,6 +9,15 @@ LOWANG = -30 # Lowest number in range
 HIGHANG = 30 # Highest number in range
 TURNANG = 180 # Default angle for robot to turn when it bumbs/detects a cliff
 SPEED = 100 # Speed to use for all robot movements
+
+# Creating a logger to log Roomba events
+logger = logging.getLogger('Roomba_Events')
+logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler('Roomba_Events.log')
+fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s, %(message)s')
+fh.setFormatter(formatter)
+logger.addHandler(fh)
 
 # Function randomAngle takes in two integers in a range from low to high 
 # and generates a random number N such that low <= N <= high
@@ -25,6 +35,7 @@ def randomDirection():
 def turnClockwise():
   connection.drive_direct(SPEED,-SPEED)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
+  logger.info('CLOCKWISE ANGLE: %s', totalAngle)
   waitTime = connection.turnTime(SPEED, totalAngle)
   connection.tpause(waitTime)
 
@@ -32,6 +43,7 @@ def turnClockwise():
 def turnCounterClockwise():
   connection.drive_direct(-SPEED,SPEED)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
+  logger.info('COUNTERCLOCKWISE ANGLE: %S', totalAngle)
   waitTime = connection.turnTime(SPEED, totalAngle)
   connection.tpause(waitTime)
   
@@ -49,11 +61,13 @@ def cantStopWontStop():
     cliff = connection.read_cliff()
 
     if wheelDrop:
+      logger.warning('UNSAFE')
       connection.stop()
-      connection.song())
+      connection.song()
       MOVING = False
       break
     elif cliff != 0: #((cliffLeft or cliffFrontLeft) and (cliffRight or cliffFrontRight)):
+      logger.warning('UNSAFE')
       connection.stop()
       if randomDirection() == 0:
         turnClockwise()
@@ -86,9 +100,11 @@ while True:
   cliff = connection.read_cliff()
 
   if not MOVING and not wheelDrop and cliff==0 and cleanDetect: #(cliffLeft or cliffFrontLeft or cliffFrontRight or cliffRight) and cleanDetect:
+    logger.info('BUTTON')
     myThread = threading.Thread(target=cantStopWontStop)
     MOVING = True
     myThread.start()
   elif MOVING and cleanDetect:
+    logger.info('BUTTON')
     MOVING = False
     connection.stop()
