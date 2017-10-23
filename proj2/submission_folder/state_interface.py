@@ -212,13 +212,9 @@ class Interface:
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(RIGHT))
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_RIGHT))
-    data = self.connection.read_data(4) #read 4 bytes
-    left = struct.unpack("I", data)[0]
-    frontLeft = struct.unpack("I",data)[1]
-    right = struct.unpack("I",data)[2]
-    frontRight = struct.unpack("I",data)[3]
+    byte = self.connection.read_data(4) #read 4 bytes
     lock.release()
-    return (left,frontLeft,right,frontRight)
+    return byte
       
     
   def getClean(self):
