@@ -210,12 +210,15 @@ class Interface:
     lock.acquire()
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(LEFT))
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
-    self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
-    self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
+    self.connection.send_command(str(SENSORS_OPCODE)+" "+str(RIGHT))
+    self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_RIGHT))
     data = self.connection.read_data(4) #read 4 bytes
-    byte = struct.unpack("I", data)[0]
+    left = struct.unpack("I", data)[0]
+    frontLeft = struct.unpack("I",data)[1]
+    right = struct.unpack("I",data)[2]
+    frontRight = struct.unpack("I",data)[3]
     lock.release()
-    return byte
+    return (left,frontLeft,right,frontRight)
       
     
   def getClean(self):
