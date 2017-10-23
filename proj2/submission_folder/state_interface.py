@@ -33,6 +33,7 @@ FULL = "132"
 
 SENSORS_OPCODE = "142"
 DATA_SIZE = 1 # in bytes
+TRUE = 1
 
 # Buttons *********************************************************************#
 #        
@@ -209,13 +210,21 @@ class Interface:
   def read_cliff(self):
     lock.acquire()
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(LEFT))
+    left = bool(TRUE & struct.unpack('B',self.connection.read_data(1))[0])
+
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
+    frontLeft = bool(TRUE & struct.unpack('B',self.connection.read_data(1))[0])
+
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(RIGHT))
+    right = bool(TRUE & struct.unpack(self.connection.read_data(1))[0])
+
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_RIGHT))
-    data = self.connection.read_data(4) #read 4 bytes
-    byte = struct.unpack("I", data)[0]
+    FRONT_RIGHT = bool(TRUE & struct.unpack(self.connection.read_data(1))[0])
+
+    #data = self.connection.read_data(4) #read 4 bytes
+    #byte = struct.unpack("I", data)[0]
     lock.release()
-    return byte
+    return (left,frontleft,right,frontRight)
       
     
   def getClean(self):
