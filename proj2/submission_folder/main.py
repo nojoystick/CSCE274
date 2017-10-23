@@ -28,7 +28,6 @@ def randomAngle(low, high):
 # which direction the roomba should rotate. 0 indicates turn left, 
 # 1 indicates turn right.
 def randomDirection():
-  print "in random direction"
   return random.randint(0,1)
 
 # Function that tells the robot to turn clockwise for 180 + (-30,30) degrees
@@ -43,7 +42,7 @@ def turnClockwise():
 def turnCounterClockwise():
   connection.drive_direct(-SPEED,SPEED)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
-  logger.info('COUNTERCLOCKWISE ANGLE: %S', totalAngle)
+  logger.info('COUNTERCLOCKWISE ANGLE: %s', totalAngle)
   waitTime = connection.turnTime(SPEED, totalAngle)
   connection.tpause(waitTime)
   
