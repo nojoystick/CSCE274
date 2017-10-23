@@ -210,21 +210,21 @@ class Interface:
   def read_cliff(self):
     lock.acquire()
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(LEFT))
-    left = bool(TRUE & struct.unpack('B',self.connection.read_data(1))[0])
+    #left = bool(TRUE & struct.unpack('B',self.connection.read_data(1))[0])
 
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
-    frontLeft = bool(TRUE & struct.unpack('B',self.connection.read_data(1))[0])
+    #frontLeft = bool(TRUE & struct.unpack('B',self.connection.read_data(1))[0])
 
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(RIGHT))
-    right = bool(TRUE & struct.unpack(self.connection.read_data(1))[0])
+    #right = bool(TRUE & struct.unpack('B',self.connection.read_data(1))[0])
 
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_RIGHT))
-    FRONT_RIGHT = bool(TRUE & struct.unpack(self.connection.read_data(1))[0])
+    #FRONT_RIGHT = bool(TRUE & struct.unpack('B',self.connection.read_data(1))[0])
 
-    #data = self.connection.read_data(4) #read 4 bytes
-    #byte = struct.unpack("I", data)[0]
+    data = self.connection.read_data(4) #read 4 bytes
+    byte = struct.unpack("I", data)[0]
     lock.release()
-    return (left,frontleft,right,frontRight)
+    return byte #(left,frontLeft,right,frontRight)
       
     
   def getClean(self):

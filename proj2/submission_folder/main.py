@@ -50,14 +50,10 @@ def cantStopWontStop():
   global MOVING
 
   while MOVING:
-    wheelDrop = False
-    bumpLeft = False
-    bumpRight = False
-    cliff = 0
     connection.drive_direct(SPEED,SPEED)
     wheelDrop,bumpLeft,bumpRight = connection.bump_wheel_drop()
-    cliffLeft, cliffFrontLeft, cliffRight, cliffFrontRight = connection.read_cliff()
-    #cliff = connection.read_cliff()
+    #cliffLeft, cliffFrontLeft, cliffRight, cliffFrontRight = connection.read_cliff()
+    cliff = connection.read_cliff()
 
     if wheelDrop:
       logger.warning('UNSAFE')
@@ -65,17 +61,23 @@ def cantStopWontStop():
       connection.song()
       MOVING = False
       break
-    elif ((cliffLeft or cliffFrontLeft) and (cliffRight or cliffFrontRight)):
-      logger.warning('UNSAFE')
+    elif cliff != 0:
       connection.stop()
       if randomDirection() == 0:
         turnClockwise()
       else:
         turnCounterClockwise()
-    elif cliffLeft or cliffFrontLeft:
-      turnClockwise()
-    elif cliffRight or cliffFrontRight:
-      turnCounterClockwise()
+    #elif ((cliffLeft or cliffFrontLeft) and (cliffRight or cliffFrontRight)):
+      #logger.warning('UNSAFE')
+      #connection.stop()
+      #if randomDirection() == 0:
+       # turnClockwise()
+      #else:
+       # turnCounterClockwise()
+    #elif cliffLeft or cliffFrontLeft:
+     # turnClockwise()
+    #elif cliffRight or cliffFrontRight:
+     # turnCounterClockwise()
     elif bumpLeft and bumpRight:
       connection.stop()
       if randomDirection() == 0:
@@ -95,10 +97,10 @@ connection.song()
 while True: 
   cleanDetect = connection.read_button(connection.getClean())
   wheelDrop, bumpLeft, bumpRight = connection.bump_wheel_drop()
-  cliffLeft, cliffFrontLeft, cliffRight, cliffFrontRight = connection.read_cliff()
-  #cliff = connection.read_cliff()
+  #cliffLeft, cliffFrontLeft, cliffRight, cliffFrontRight = connection.read_cliff()
+  cliff = connection.read_cliff()
 
-  if not MOVING and not wheelDrop and (cliffLeft or cliffFrontLeft or cliffFrontRight or cliffRight) and cleanDetect:
+  if not MOVING and not wheelDrop and cliff == 0 and cleanDetect:#(cliffLeft or cliffFrontLeft or cliffFrontRight or cliffRight) and cleanDetect:
     logger.info('BUTTON')
     myThread = threading.Thread(target=cantStopWontStop)
     MOVING = True
