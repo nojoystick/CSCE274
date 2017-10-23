@@ -212,7 +212,8 @@ class Interface:
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(RIGHT))
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_RIGHT))
-    byte = self.connection.read_data(4) #read 4 bytes
+    data = self.connection.read_data(4) #read 4 bytes
+    byte = struct.unpack("I", data)[0]
     lock.release()
     return byte
       
