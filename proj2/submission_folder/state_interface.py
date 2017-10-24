@@ -34,6 +34,8 @@ FULL = "132"
 SENSORS_OPCODE = "142"
 DATA_SIZE = 1 # in bytes
 TRUE = 1
+DIST_PACK = "19"
+ANGLE_PACK = "20"
 
 # Buttons *********************************************************************#
 #        
@@ -181,6 +183,16 @@ class Interface:
 #    read_cliff: checks for cliff sensor.
 #      returns five booleans:
 #        left, front left, right, front right, virtual wall
+#
+#    read_angle: returns, in two bytes, the total degrees the robot 
+#      has turned since the function was last called.
+#
+#    read_distance: returns, in two bytes, the total millimeters the robot
+#      has traveled since the function was last called.
+#
+#    getClean: an accessor for the value of the clean button.
+#
+#
 #   
 #
 #******************************************************************************#
@@ -210,24 +222,33 @@ class Interface:
   def read_cliff(self):
     lock.acquire()
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(LEFT))
-    #left = bool(TRUE & struct.unpack('B',self.connection.read_data(1))[0])
-
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_LEFT))
-    #frontLeft = bool(TRUE & struct.unpack('B',self.connection.read_data(1))[0])
-
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(RIGHT))
-    #right = bool(TRUE & struct.unpack('B',self.connection.read_data(1))[0])
-
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(FRONT_RIGHT))
-    #FRONT_RIGHT = bool(TRUE & struct.unpack('B',self.connection.read_data(1))[0])
-
     data = self.connection.read_data(4) #read 4 bytes
     byte = struct.unpack("I", data)[0]
     lock.release()
-    return byte #(left,frontLeft,right,frontRight)
+    return byte
       
-    
-  def getClean(self):
+  def read_angle(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+" "+str(ANGLE_PACK))
+    data = self.connection.read_data(2) # read 2 bytes
+    byte = struct.unpack("B", data)[0]
+    lock.release()
+    return byte
+
+
+
+  def read_distance(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+" "+str(DIST_PACK))
+    data = self.connection.read_data(2) # read 2 bytes
+    byte = struct.unpack("B", data)[0]
+    lock.release()
+    return byte
+  
+  getClean(self):
     return CLEAN
 
 
