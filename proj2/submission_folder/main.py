@@ -35,7 +35,7 @@ def turnClockwise():
   connection.drive_direct(SPEED,-SPEED)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
   waitTime = connection.turnTime(SPEED, totalAngle)
-  logger.info(connection.read_angle())
+  logger.info(connection.read_angle()) # Logs the angle the robot has turned since last checked
   connection.tpause(waitTime)
 
 # Function that tells the robot to turn counterclockwise for 180 + (-30,30) degrees
@@ -43,16 +43,16 @@ def turnCounterClockwise():
   connection.drive_direct(-SPEED,SPEED)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
   waitTime = connection.turnTime(SPEED, totalAngle)
-  logger.info(connection.read_angle())
+  logger.info(connection.read_angle()) # Logs the angle the robot has turned since last checked
   connection.tpause(waitTime)
   
+# After every moment the robot stops moving completely, the total distance it drove up until that point is logged.
 def cantStopWontStop():
   global MOVING
 
   while MOVING:
     connection.drive_direct(SPEED,SPEED)
     wheelDrop,bumpLeft,bumpRight = connection.bump_wheel_drop()
-    #cliffLeft, cliffFrontLeft, cliffRight, cliffFrontRight = connection.read_cliff()
     cliff = connection.read_cliff()
 
     if wheelDrop:
@@ -69,17 +69,6 @@ def cantStopWontStop():
         turnClockwise()
       else:
         turnCounterClockwise()
-    #elif ((cliffLeft or cliffFrontLeft) and (cliffRight or cliffFrontRight)):
-      #logger.warning('UNSAFE')
-      #connection.stop()
-      #if randomDirection() == 0:
-       # turnClockwise()
-      #else:
-       # turnCounterClockwise()
-    #elif cliffLeft or cliffFrontLeft:
-     # turnClockwise()
-    #elif cliffRight or cliffFrontRight:
-     # turnCounterClockwise()
     elif bumpLeft and bumpRight:
       connection.stop()
       logger.info(connection.read_distance())
@@ -98,14 +87,12 @@ def cantStopWontStop():
 
 connection = state_interface.Interface()
 connection.set_full()
-connection.song()
 while True: 
   cleanDetect = connection.read_button(connection.getClean())
   wheelDrop, bumpLeft, bumpRight = connection.bump_wheel_drop()
-  #cliffLeft, cliffFrontLeft, cliffRight, cliffFrontRight = connection.read_cliff()
   cliff = connection.read_cliff()
 
-  if not MOVING and not wheelDrop and cliff == 0 and cleanDetect:#(cliffLeft or cliffFrontLeft or cliffFrontRight or cliffRight) and cleanDetect:
+  if not MOVING and not wheelDrop and cliff == 0 and cleanDetect:
     logger.info('BUTTON')
     myThread = threading.Thread(target=cantStopWontStop)
     MOVING = True
