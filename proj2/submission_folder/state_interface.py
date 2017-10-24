@@ -234,7 +234,7 @@ class Interface:
     lock.acquire()
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(ANGLE_PACK))
     data = self.connection.read_data(2) # read 2 bytes
-    byte = struct.unpack("2B", data)[0]
+    byte = struct.unpack(">h", data)[0]
     lock.release()
     return byte
 
@@ -244,7 +244,7 @@ class Interface:
     lock.acquire()
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(DIST_PACK))
     data = self.connection.read_data(2) # read 2 bytes
-    byte = struct.unpack("2B", data)[0]
+    byte = struct.unpack(">h", data)[0]
     lock.release()
     return byte
   
