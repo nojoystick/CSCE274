@@ -35,7 +35,7 @@ def turnClockwise():
   connection.drive_direct(SPEED,-SPEED)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
   waitTime = connection.turnTime(SPEED, totalAngle)
-  logger.info(connection.read_angle()) # Logs the angle the robot has turned since last checked
+  logger.info("ANGLE: %s",connection.read_angle()) # Logs the angle the robot has turned since last checked
   connection.tpause(waitTime)
 
 # Function that tells the robot to turn counterclockwise for 180 + (-30,30) degrees
@@ -43,7 +43,7 @@ def turnCounterClockwise():
   connection.drive_direct(-SPEED,SPEED)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
   waitTime = connection.turnTime(SPEED, totalAngle)
-  logger.info(connection.read_angle()) # Logs the angle the robot has turned since last checked
+  logger.info("ANGLE: %s",connection.read_angle()) # Logs the angle the robot has turned since last checked
   connection.tpause(waitTime)
   
 # After every moment the robot stops moving completely, the total distance it drove up until that point is logged.
@@ -58,31 +58,31 @@ def cantStopWontStop():
     if wheelDrop:
       logger.warning('UNSAFE')
       connection.stop()
-      logger.info(connection.reaed_distance())
+      logger.info("DISTANCE: %s",connection.read_distance())
       connection.song()
       MOVING = False
       break
     elif cliff != 0:
       connection.stop()
-      logger.info(connection.read_distance())
+      logger.info("DISTANCE: %s",connection.read_distance())
       if randomDirection() == 0:
         turnClockwise()
       else:
         turnCounterClockwise()
     elif bumpLeft and bumpRight:
       connection.stop()
-      logger.info(connection.read_distance())
+      logger.info("DISTANCE: %s",connection.read_distance())
       if randomDirection() == 0:
         turnClockwise()
       else:
         turnCounterClockwise()
     elif bumpLeft:
       connection.stop()
-      logger.info(connection.read_distance())
+      logger.info("DISTANCE: %s",connection.read_distance())
       turnClockwise()
     elif bumpRight:
       connection.stop()
-      logger.info(connection.read_distance())
+      logger.info("DISTANCE: %s",connection.read_distance())
       turnCounterClockwise()
 
 connection = state_interface.Interface()
@@ -101,4 +101,4 @@ while True:
     logger.info('BUTTON')
     MOVING = False
     connection.stop()
-    logger.info(connection.read_distance())
+    logger.info("DISTANCE: %s",connection.read_distance())
