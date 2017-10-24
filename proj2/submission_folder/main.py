@@ -34,16 +34,16 @@ def randomDirection():
 def turnClockwise():
   connection.drive_direct(SPEED,-SPEED)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
-  logger.info('CLOCKWISE ANGLE: %s', totalAngle)
   waitTime = connection.turnTime(SPEED, totalAngle)
+  logger.info(connection.read_angle())
   connection.tpause(waitTime)
 
 # Function that tells the robot to turn counterclockwise for 180 + (-30,30) degrees
 def turnCounterClockwise():
   connection.drive_direct(-SPEED,SPEED)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
-  logger.info('COUNTERCLOCKWISE ANGLE: %s', totalAngle)
   waitTime = connection.turnTime(SPEED, totalAngle)
+  logger.info(connection.read_angle())
   connection.tpause(waitTime)
   
 def cantStopWontStop():
@@ -58,11 +58,13 @@ def cantStopWontStop():
     if wheelDrop:
       logger.warning('UNSAFE')
       connection.stop()
+      logger.info(connection.reaed_distance())
       connection.song()
       MOVING = False
       break
     elif cliff != 0:
       connection.stop()
+      logger.info(connection.read_distance())
       if randomDirection() == 0:
         turnClockwise()
       else:
@@ -80,15 +82,18 @@ def cantStopWontStop():
      # turnCounterClockwise()
     elif bumpLeft and bumpRight:
       connection.stop()
+      logger.info(connection.read_distance())
       if randomDirection() == 0:
         turnClockwise()
       else:
         turnCounterClockwise()
     elif bumpLeft:
       connection.stop()
+      logger.info(connection.read_distance())
       turnClockwise()
     elif bumpRight:
       connection.stop()
+      logger.info(connection.read_distance())
       turnCounterClockwise()
 
 connection = state_interface.Interface()
@@ -109,3 +114,4 @@ while True:
     logger.info('BUTTON')
     MOVING = False
     connection.stop()
+    logger.info(connection.read_distance())
