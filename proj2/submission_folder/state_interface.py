@@ -248,7 +248,7 @@ class Interface:
     lock.release()
     return byte
   
-  getClean(self):
+  def getClean(self):
     return CLEAN
 
 
