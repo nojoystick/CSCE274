@@ -79,10 +79,14 @@ FRONT_RIGHT = 11
 VIRTUAL_WALL = 13
 
 # Infrared Sensor *************************************************************#
-# Returns a single unsigned data byte
-# Packet ID 17 is the Omni-directional IR sensor
 
-INFRARED_PACK = 17
+INFRARED_PACK = 17 # Omnidirectional infrared beacon
+LIGHT_LEFT_PACK = 46 
+LIGHT_FRONT_LEFT_PACK = 47 
+LIGHT_CENTER_LEFT_PACK = 48
+LIGHT_CENTER_RIGHT_PACK = 49
+LIGHT_FRONT_RIGHT_PACK = 50
+LIGHT_RIGHT_PACK = 51
 
 #********* SENDING DATA *******************************************************#
 #
@@ -255,11 +259,59 @@ class Interface:
 
   def read_ir_omni(self):
     lock.acquire()
-    slf.connection..send_command(str(SENSORS_OPCODE)+ " " +str(INFRARED_PACK))
+    slf.connection.send_command(str(SENSORS_OPCODE)+ " " +str(INFRARED_PACK))
     data = self.connection.read_data(1)
     byte = struct.unpack("B", data)[0]
     lock.release()
     return byte
+
+ def read_light_left(self):
+   lock.acquire()
+   self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_LEFT_PACK))
+   data = selft.connection.read_data(2)
+   byte = struct.unpack(">H", data)[0]
+   lock.release()
+   return byte
+
+ def read_light_front_left(self):
+   lock.acquire()
+   self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_FRONT_LEFT_PACK))
+   data = selft.connection.read_data(2)
+   byte = struct.unpack(">H", data)[0]
+   lock.release()
+   return byte
+
+ def read_light_center_left(self):
+   lock.acquire()
+   self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_CENTER_LEFT_PACK))
+   data = selft.connection.read_data(2)
+   byte = struct.unpack(">H", data)[0]
+   lock.release()
+   return byte
+
+ def read_light_center_right(self):
+   lock.acquire()
+   self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_CENTER_RIGHT_PACK))
+   data = selft.connection.read_data(2)
+   byte = struct.unpack(">H", data)[0]
+   lock.release()
+   return byte
+
+ def read_light_front_right(self):
+   lock.acquire()
+   self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_FRONT_RIGHT_PACK))
+   data = selft.connection.read_data(2)
+   byte = struct.unpack(">H", data)[0]
+   lock.release()
+   return byte
+
+ def read_light_right(self):
+   lock.acquire()
+   self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_RIGHT_PACK))
+   data = selft.connection.read_data(2)
+   byte = struct.unpack(">H", data)[0]
+   lock.release()
+   return byte
 
   def getClean(self):
     return CLEAN
