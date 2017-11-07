@@ -26,6 +26,10 @@ formatter = logging.Formatter('%(asctime)s, %(message)s')
 fh.setFormatter(formatter)
 logger.addHandler(fh)
 
+#NOTE: Our Controller should only be a PD which means we do not have to worry about integral gains I think?
+# I believe all we would do is take out the I and ki for the following equation.
+# Also, it appears this only corrects for error on the right wall?
+
 # - PID Controller - Returns a value based off of sensor data.  Returned value determines what to do
 #def pid():
 #	global le
