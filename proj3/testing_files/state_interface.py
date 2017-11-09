@@ -259,59 +259,59 @@ class Interface:
 
   def read_ir_omni(self):
     lock.acquire()
-    slf.connection.send_command(str(SENSORS_OPCODE)+ " " +str(INFRARED_PACK))
+    self.connection.send_command(str(SENSORS_OPCODE)+ " " +str(INFRARED_PACK))
     data = self.connection.read_data(1)
     byte = struct.unpack("B", data)[0]
     lock.release()
     return byte
 
- def read_light_left(self):
-   lock.acquire()
-   self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_LEFT_PACK))
-   data = selft.connection.read_data(2)
-   byte = struct.unpack(">H", data)[0]
-   lock.release()
-   return byte
+  def read_light_left(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_LEFT_PACK))
+    data = self.connection.read_data(2)
+    byte = struct.unpack(">H", data)[0]
+    lock.release()
+    return byte
 
- def read_light_front_left(self):
-   lock.acquire()
-   self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_FRONT_LEFT_PACK))
-   data = selft.connection.read_data(2)
-   byte = struct.unpack(">H", data)[0]
-   lock.release()
-   return byte
+  def read_light_front_left(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_FRONT_LEFT_PACK))
+    data = self.connection.read_data(2)
+    byte = struct.unpack(">H", data)[0]
+    lock.release()
+    return byte
 
- def read_light_center_left(self):
-   lock.acquire()
-   self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_CENTER_LEFT_PACK))
-   data = selft.connection.read_data(2)
-   byte = struct.unpack(">H", data)[0]
-   lock.release()
-   return byte
+  def read_light_center_left(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_CENTER_LEFT_PACK))
+    data = self.connection.read_data(2)
+    byte = struct.unpack(">H", data)[0]
+    lock.release()
+    return byte
 
- def read_light_center_right(self):
-   lock.acquire()
-   self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_CENTER_RIGHT_PACK))
-   data = selft.connection.read_data(2)
-   byte = struct.unpack(">H", data)[0]
-   lock.release()
-   return byte
+  def read_light_center_right(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_CENTER_RIGHT_PACK))
+    data = self.connection.read_data(2)
+    byte = struct.unpack(">H", data)[0]
+    lock.release()
+    return byte
 
- def read_light_front_right(self):
-   lock.acquire()
-   self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_FRONT_RIGHT_PACK))
-   data = selft.connection.read_data(2)
-   byte = struct.unpack(">H", data)[0]
-   lock.release()
-   return byte
+  def read_light_front_right(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_FRONT_RIGHT_PACK))
+    data = self.connection.read_data(2)
+    byte = struct.unpack(">H", data)[0]
+    lock.release()
+    return byte
 
- def read_light_right(self):
-   lock.acquire()
-   self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_RIGHT_PACK))
-   data = selft.connection.read_data(2)
-   byte = struct.unpack(">H", data)[0]
-   lock.release()
-   return byte
+  def read_light_right(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_RIGHT_PACK))
+    data = self.connection.read_data(2)
+    byte = struct.unpack(">H", data)[0]
+    lock.release()
+    return byte
 
   def getClean(self):
     return CLEAN
