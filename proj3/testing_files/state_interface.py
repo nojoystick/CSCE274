@@ -1,6 +1,7 @@
 import serial
 import struct
 import math
+import random
 from time import sleep
 from threading import Thread, Lock
 import connection_interface
@@ -121,6 +122,15 @@ MAX_RADIUS = 2000
 MIN_RADIUS = -2000
 DRIVE_COMMAND = "137"
 DIRECT_COMMAND = "145"
+
+# Random **********************************************************************#
+SPEED = 100;
+LOWANG = -15;
+HIGHANG = 15;
+TURNANG = 90;
+SPEED = 100;
+TBACKUP = 3;
+
 
 #********* INTERFACE CLASS ****************************************************#
 #
@@ -317,7 +327,7 @@ class Interface:
     return CLEAN
 
 
-#******* SENDING DATA TO THE ROBOT ********************************************#
+#******* SENDING DATA TO THE ROBOT - DRIVING AND SONG *************************#
 #
 #  Functions:
 #
@@ -448,3 +458,31 @@ class Interface:
     command = str((str(opcode)+" "+str(p1)+" "+str(
                p2)+" "+str(p3)+" "+str(p4)))
     return command
+
+#******* SENDING DATA TO THE ROBOT - HANDLING AN OBSTACLE *********************#
+#
+# randomAngle - generates a random angle +- 90 degrees
+# turnCounterClockwise - turns counterclockwise at a random angle +-90 deg
+# backUp - drives backwards for 1.5 seconds
+# obstacle - the robot's action when it hits an obstacle. Drives backwards for
+#             1.5 seconds and then turns at a random angle +- 90 deg
+#
+#******************************************************************************#
+
+def randomAngle(low, high):
+  return random.randint(low, high)
+
+def turnCounterClockwise():
+  self.drive_direct(SPEED,-SPEED)
+  totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
+  waitTime = self.turnTime(SPEED, totalAngle)
+  self.tpause(waitTime)
+
+def backUp():
+  self.drive_direct(-SPEED, -SPEED)
+  self.tpause(TBACKUP)
+
+def obstacle():
+  self.backUp()
+  self.turnCounterClockwise()
+
