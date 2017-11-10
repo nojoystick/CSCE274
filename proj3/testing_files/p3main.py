@@ -31,18 +31,24 @@ logger.addHandler(fh)
 # Also, it appears this only corrects for error on the right wall?
 
 # - PID Controller - Returns a value based off of sensor data.  Returned value determines what to do
-#def pid():
+#def pd():
 #	global le
 #	global pe
 #	#frwall = retFRWall()
 #	#crwall = retCRWall()
 #	e = sp - retRWall() - 10*retFRWall() - 10*retCRWall()        #Error
 #	P = kp*e                  		#Proportional Controller
-#	I = ki*( pe + e )         		#Integral Controller
 #	D = kd*( e - le )/st      		#Derivative Controller
-#	u = P + I + D     	  		#Controller Output
-#	pe = I                    		#Updates past error
+#	u = P  + D     	  			#Controller Output
 #	le = e			  		#Updates last error
+
+
+# CAPS FOR VISIBILITY
+# SHOULD WE MOVE THIS ANGLE/TURNING STUFF TO THE BACK END
+# ALSO SINCE WE'RE FOLLOWING WALLS SHOULD WE ADJUST THE ANGLE TO BE SOMETHING
+# LIKE 90 RATHER THAN 180?
+
+
 
 # Function randomAngle takes in two integers in a range from low to high 
 # and generates a random number N such that low <= N <= high
@@ -72,58 +78,57 @@ def turnCounterClockwise():
   connection.tpause(waitTime)
   
 # After every moment the robot stops moving completely, the total distance it drove up until that point is logged.
-def cantStopWontStop():
+def FollowWall():
   global MOVING
 
   while MOVING:
     connection.drive_direct(SPEED,SPEED)
     wheelDrop,bumpLeft,bumpRight = connection.bump_wheel_drop()
-    cliff = connection.read_cliff()
+
+
+# NOT SURE IF WE DO THIS HERE OR IN THE PD
+    # while left light sensor > x distance from the wall
+      # drive diagonally left
+    # while left light sensor < x distance from the wall
+      # drive diagonally right
+    # should we use infra/other sensors to check the front for corners?
 
     if wheelDrop:
-      logger.warning('UNSAFE')
       connection.stop()
-      logger.info("DISTANCE: %s",connection.read_distance())
       connection.song()
       MOVING = False
       break
     elif cliff != 0:
       connection.stop()
-      logger.info("DISTANCE: %s",connection.read_distance())
       if randomDirection() == 0:
         turnClockwise()
       else:
         turnCounterClockwise()
     elif bumpLeft and bumpRight:
       connection.stop()
-      logger.info("DISTANCE: %s",connection.read_distance())
       if randomDirection() == 0:
         turnClockwise()
       else:
         turnCounterClockwise()
     elif bumpLeft:
       connection.stop()
-      logger.info("DISTANCE: %s",connection.read_distance())
       turnClockwise()
     elif bumpRight:
       connection.stop()
-      logger.info("DISTANCE: %s",connection.read_distance())
       turnCounterClockwise()
 
 connection = state_interface.Interface()
 connection.set_full()
+
 while True: 
   cleanDetect = connection.read_button(connection.getClean())
   wheelDrop, bumpLeft, bumpRight = connection.bump_wheel_drop()
   cliff = connection.read_cliff()
 
   if not MOVING and not wheelDrop and cliff == 0 and cleanDetect:
-    logger.info('BUTTON')
-    myThread = threading.Thread(target=cantStopWontStop)
+    myThread = threading.Thread(target=FollowWall)
     MOVING = True
     myThread.start()
   elif MOVING and cleanDetect:
-    logger.info('BUTTON')
     MOVING = False
     connection.stop()
-    logger.info("DISTANCE: %s",connection.read_distance())
