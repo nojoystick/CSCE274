@@ -479,7 +479,7 @@ def turnCounterClockwise():
   self.tpause(waitTime)
 
 def turnClockwise():
-  self.drive_direct(SPEED,-SPEED)
+  self.drive_direct(-SPEED,SPEED)
   totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
   waitTime = self.turnTime(SPEED, totalAngle)
   self.tpause(waitTime)
