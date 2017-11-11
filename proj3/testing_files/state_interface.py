@@ -478,11 +478,20 @@ def turnCounterClockwise():
   waitTime = self.turnTime(SPEED, totalAngle)
   self.tpause(waitTime)
 
+def turnClockwise():
+  self.drive_direct(SPEED,-SPEED)
+  totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
+  waitTime = self.turnTime(SPEED, totalAngle)
+  self.tpause(waitTime)
+
 def backUp():
   self.drive_direct(-SPEED, -SPEED)
   self.tpause(TBACKUP)
 
 def obstacle():
+  LR = random.randint(0,1)
   self.backUp()
-  self.turnCounterClockwise()
-
+  if LR = 0:
+    self.turnCounterClockwise()
+  else:
+    self.turnClockwise()
