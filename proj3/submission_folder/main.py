@@ -9,96 +9,82 @@ LOWANG = -30 # Lowest number in range
 HIGHANG = 30 # Highest number in range
 TURNANG = 180 # Default angle for robot to turn when it bumbs/detects a cliff
 SPEED = 100 # Speed to use for all robot movements
+sp = 700 # Set point
+pe = 0 # Past Error
+le = 0 # Last Error
+st = .5 # Sampling Time
+kp = .016 # Proportional Gain
+kd = .002 # Derivative Gain
+LSPEED = 0
+RSPEED = 0
 
-# Creating a logger to log Roomba events
-logger = logging.getLogger('Roomba_Events')
-logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler('Roomba_Events.log')
-fh.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s, %(message)s')
-fh.setFormatter(formatter)
-logger.addHandler(fh)
+# - PID Controller - Returns a value based off of sensor data.  Returned value determines what to do
+def pd():
+  global le
+  global pe
+  e = sp - connection.read_light_right() - 10*connection.read_light_front_right() - 10*connection.read_light_center_right()        #Error
+  P = kp*e                  		#Proportional Controller
+  D = kd*( e - le )/st      		#Derivative Controller
+  u = P  + D     	  			#Controller Output
+  le = e
+  return int(u)			  		#Updates last error
 
-# Function randomAngle takes in two integers in a range from low to high 
-# and generates a random number N such that low <= N <= high
-def randomAngle(low, high):
-  return random.randint(low, high)
 
-# Function randomDirection generates either 0 or 1 to determine 
-# which direction the roomba should rotate. 0 indicates turn left, 
-# 1 indicates turn right.
-def randomDirection():
-  return random.randint(0,1)
-
-# Function that tells the robot to turn clockwise for 180 + (-30,30) degrees
-def turnClockwise():
-  connection.drive_direct(SPEED,-SPEED)
-  totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
-  waitTime = connection.turnTime(SPEED, totalAngle)
-  logger.info("ANGLE: %s",connection.read_angle()) # Logs the angle the robot has turned since last checked
-  connection.tpause(waitTime)
-
-# Function that tells the robot to turn counterclockwise for 180 + (-30,30) degrees
-def turnCounterClockwise():
-  connection.drive_direct(-SPEED,SPEED)
-  totalAngle = TURNANG + randomAngle(LOWANG, HIGHANG)
-  waitTime = connection.turnTime(SPEED, totalAngle)
-  logger.info("ANGLE: %s",connection.read_angle()) # Logs the angle the robot has turned since last checked
-  connection.tpause(waitTime)
-  
-# After every moment the robot stops moving completely, the total distance it drove up until that point is logged.
-def cantStopWontStop():
+def FollowWall():
   global MOVING
-
+  global LSPEED
+  global RSPEED
   while MOVING:
-    connection.drive_direct(SPEED,SPEED)
-    wheelDrop,bumpLeft,bumpRight = connection.bump_wheel_drop()
-    cliff = connection.read_cliff()
+    LSPEED = 50
+    RSPEED = 50
+    connection.drive_direct(RSPEED,LSPEED)
+    wheelDrop,bumpRight,bumpLeft = connection.bump_wheel_drop()
 
     if wheelDrop:
-      logger.warning('UNSAFE')
       connection.stop()
-      logger.info("DISTANCE: %s",connection.read_distance())
       connection.song()
       MOVING = False
       break
     elif cliff != 0:
       connection.stop()
-      logger.info("DISTANCE: %s",connection.read_distance())
-      if randomDirection() == 0:
-        turnClockwise()
-      else:
-        turnCounterClockwise()
-    elif bumpLeft and bumpRight:
-      connection.stop()
-      logger.info("DISTANCE: %s",connection.read_distance())
-      if randomDirection() == 0:
-        turnClockwise()
-      else:
-        turnCounterClockwise()
+      connection.obstacle()
     elif bumpLeft:
       connection.stop()
-      logger.info("DISTANCE: %s",connection.read_distance())
-      turnClockwise()
+      connection.turnClockwise()
     elif bumpRight:
       connection.stop()
-      logger.info("DISTANCE: %s",connection.read_distance())
-      turnCounterClockwise()
+      connection.turnCounterClockwise()
+    elif bumpLeft and bumpRight:
+      connection.stop()
+      connection.obstacle()
+    
+    u = pd()
+    print u
+    if u > 14:
+      LSPEED = 30
+      RSPEED = 20
+    elif (u >= 9 and u <= 11):
+      LSPEED = 150 + u
+      RSPEED = 35 - u
+    else:
+      LSPEED = 35 + u
+      RSPEED = 35-u
+    if MOVING:
+      connection.drive_direct(RSPEED,LSPEED)
+      connection.tpause(st)
 
 connection = state_interface.Interface()
 connection.set_full()
+
 while True: 
   cleanDetect = connection.read_button(connection.getClean())
   wheelDrop, bumpLeft, bumpRight = connection.bump_wheel_drop()
   cliff = connection.read_cliff()
 
   if not MOVING and not wheelDrop and cliff == 0 and cleanDetect:
-    logger.info('BUTTON')
-    myThread = threading.Thread(target=cantStopWontStop)
+    myThread = threading.Thread(target=FollowWall)
     MOVING = True
     myThread.start()
   elif MOVING and cleanDetect:
-    logger.info('BUTTON')
     MOVING = False
     connection.stop()
-    logger.info("DISTANCE: %s",connection.read_distance())

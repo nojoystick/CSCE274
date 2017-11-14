@@ -1,6 +1,7 @@
 import serial
 import struct
 import math
+import random
 from time import sleep
 from threading import Thread, Lock
 import connection_interface
@@ -78,7 +79,16 @@ RIGHT = 12
 FRONT_RIGHT = 11
 VIRTUAL_WALL = 13
 
-  
+# Infrared Sensor *************************************************************#
+
+INFRARED_PACK = 17 # Omnidirectional infrared beacon
+LIGHT_LEFT_PACK = 46 
+LIGHT_FRONT_LEFT_PACK = 47 
+LIGHT_CENTER_LEFT_PACK = 48
+LIGHT_CENTER_RIGHT_PACK = 49
+LIGHT_FRONT_RIGHT_PACK = 50
+LIGHT_RIGHT_PACK = 51
+
 #********* SENDING DATA *******************************************************#
 #
 #  Data for sending commands to the robot, including driving and song 
@@ -112,6 +122,15 @@ MAX_RADIUS = 2000
 MIN_RADIUS = -2000
 DRIVE_COMMAND = "137"
 DIRECT_COMMAND = "145"
+
+# Random **********************************************************************#
+SPEED = 100;
+LOWANG = -15;
+HIGHANG = 15;
+TURNANG = 90;
+SPEED = 100;
+TBACKUP = 1;
+
 
 #********* INTERFACE CLASS ****************************************************#
 #
@@ -247,12 +266,68 @@ class Interface:
     byte = struct.unpack(">h", data)[0]
     lock.release()
     return byte
-  
+
+  def read_ir_omni(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " " +str(INFRARED_PACK))
+    data = self.connection.read_data(1)
+    byte = struct.unpack("B", data)[0]
+    lock.release()
+    return byte
+
+  def read_light_left(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_LEFT_PACK))
+    data = self.connection.read_data(2)
+    byte = struct.unpack(">H", data)[0]
+    lock.release()
+    return byte
+
+  def read_light_front_left(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_FRONT_LEFT_PACK))
+    data = self.connection.read_data(2)
+    byte = struct.unpack(">H", data)[0]
+    lock.release()
+    return byte
+
+  def read_light_center_left(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_CENTER_LEFT_PACK))
+    data = self.connection.read_data(2)
+    byte = struct.unpack(">H", data)[0]
+    lock.release()
+    return byte
+
+  def read_light_center_right(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_CENTER_RIGHT_PACK))
+    data = self.connection.read_data(2)
+    byte = struct.unpack(">H", data)[0]
+    lock.release()
+    return byte
+
+  def read_light_front_right(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_FRONT_RIGHT_PACK))
+    data = self.connection.read_data(2)
+    byte = struct.unpack(">H", data)[0]
+    lock.release()
+    return byte
+
+  def read_light_right(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(LIGHT_RIGHT_PACK))
+    data = self.connection.read_data(2)
+    byte = struct.unpack(">H", data)[0]
+    lock.release()
+    return byte
+
   def getClean(self):
     return CLEAN
 
 
-#******* SENDING DATA TO THE ROBOT ********************************************#
+#******* SENDING DATA TO THE ROBOT - DRIVING AND SONG *************************#
 #
 #  Functions:
 #
@@ -383,3 +458,42 @@ class Interface:
     command = str((str(opcode)+" "+str(p1)+" "+str(
                p2)+" "+str(p3)+" "+str(p4)))
     return command
+
+#******* SENDING DATA TO THE ROBOT - HANDLING AN OBSTACLE *********************#
+#
+# randomAngle - generates a random angle +- 90 degrees
+# turnCounterClockwise - turns counterclockwise at a random angle +-90 deg
+# backUp - drives backwards for 1.5 seconds
+# obstacle - the robot's action when it hits an obstacle. Drives backwards for
+#             1.5 seconds and then turns at a random angle +- 90 deg
+#
+#******************************************************************************#
+
+  def randomAngle(self,low, high):
+    return random.randint(low, high)
+
+  def turnCounterClockwise(self):
+    self.backUp()
+    self.drive_direct(SPEED,-SPEED)
+    totalAngle = TURNANG + self.randomAngle(LOWANG, HIGHANG)
+    waitTime = self.turnTime(SPEED, totalAngle)
+    self.tpause(waitTime)
+
+  def turnClockwise(self):
+    self.backUp()
+    self.drive_direct(-SPEED,SPEED)
+    totalAngle = TURNANG + self.randomAngle(LOWANG, HIGHANG)
+    waitTime = self.turnTime(SPEED, totalAngle)
+    self.tpause(waitTime)
+
+  def backUp(self):
+    self.drive_direct(-SPEED, -SPEED)
+    self.tpause(TBACKUP)
+
+  def obstacle(self):
+    LR = random.randint(0,1)
+    self.backUp()
+    if LR == 0:
+      self.turnCounterClockwise()
+    else:
+      self.turnClockwise()
