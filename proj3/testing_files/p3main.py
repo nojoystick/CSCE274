@@ -40,7 +40,7 @@ def FollowWall():
     LSPEED = 50
     RSPEED = 50
     connection.drive_direct(RSPEED,LSPEED)
-    wheelDrop,bumpLeft,bumpRight = connection.bump_wheel_drop()
+    wheelDrop,bumpRight,bumpLeft = connection.bump_wheel_drop()
 
     if wheelDrop:
       connection.stop()
@@ -50,7 +50,13 @@ def FollowWall():
     elif cliff != 0:
       connection.stop()
       connection.obstacle()
-    elif bumpLeft or bumpRight:
+    elif bumpLeft:
+      connection.stop()
+      connection.turnClockwise()
+    elif bumpRight:
+      connection.stop()
+      connection.turnCounterClockwise()
+    elif bumpLeft and bumpRight:
       connection.stop()
       connection.obstacle()
     
@@ -59,6 +65,9 @@ def FollowWall():
     if u > 14:
       LSPEED = 30
       RSPEED = 20
+    elif (u >= 9 and u <= 11):
+      LSPEED = 150 + u
+      RSPEED = 35 - u
     else:
       LSPEED = 35 + u
       RSPEED = 35-u
