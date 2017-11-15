@@ -22,12 +22,12 @@ RSPEED = 0
 def pd():
   global le
   global pe
-  e = sp - connection.read_light_right() - 10*connection.read_light_front_right() - 10*connection.read_light_center_right()        #Error
-  P = kp*e                  		#Proportional Controller
-  D = kd*( e - le )/st      		#Derivative Controller
-  u = P  + D     	  			#Controller Output
-  le = e
-  return int(u)			  		#Updates last error
+  e = sp - connection.read_light_right() - 10*connection.read_light_front_right() - 10*connection.read_light_center_right() #Error
+  P = kp*e     					# Proportional Controller
+  D = kd*( e - le )/st      	# Derivative Controller
+  u = P  + D     	  			# Controller Output
+  le = e						# Updates last error
+  return int(u)			  	
 
 
 def FollowWall():
@@ -35,6 +35,7 @@ def FollowWall():
   global LSPEED
   global RSPEED
   while MOVING:
+    # Reset driving speed to drive straight every iteration after the correction.
     LSPEED = 50
     RSPEED = 50
     connection.drive_direct(RSPEED,LSPEED)
@@ -58,8 +59,8 @@ def FollowWall():
       connection.stop()
       connection.obstacle()
     
+    # Call to the PD controller. Most of these values have been tweaked using trial and error along multiple wall designs.
     u = pd()
-    print u
     if u > 14:
       LSPEED = 30
       RSPEED = 20
@@ -68,7 +69,7 @@ def FollowWall():
       RSPEED = 35 - u
     else:
       LSPEED = 35 + u
-      RSPEED = 35-u
+      RSPEED = 35 - u
     if MOVING:
       connection.drive_direct(RSPEED,LSPEED)
       connection.tpause(st)
