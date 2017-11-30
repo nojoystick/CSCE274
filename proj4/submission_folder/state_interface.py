@@ -264,8 +264,6 @@ class Interface:
     lock.release()
     return byte
 
-
-
   def read_distance(self):
     lock.acquire()
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(DIST_PACK))
