@@ -1,0 +1,29 @@
+# We should keep this for future projects but we
+# can take it out of here because we don't need it for this one
+  def read_buttons(self):
+    # Read packet
+    button_data = self.read_packet(self, PACKET, DATA_SIZE)
+    # Check that size of input matches expected size
+    if len(button_data) == DATA_SIZE:
+      byte = struct.unpack('B', button_data)[0]
+      return {
+      #if this doesnt work change Globals to binary
+        CLEAN: bool(byte & CLEAN),
+        SPOT: bool(byte & SPOT),
+        DOCK: bool(byte & DOCK),
+        MINUTE: bool(byte & MINUTE),
+        HOUR: bool(byte & HOUR),
+        DAY: bool(byte & DAY),
+        SCHEDULE: bool(byte & SCHEDULE),
+        CLOCK: bool(byte & CLOCk)
+        }
+    # If there's a data size mismatch
+    else:
+      return {
+        CLEAN: False, SPOT: False, DOCK: False, MINUTE: False,
+        HOUR: False, DAY: False, SCHEDULE: False, CLOCK: False
+        }
+
+  def read_packet(self, packet_id, data_size):
+    self.connection.send_command(SENSORS_OPCODE+PACKET)
+    return self.connection.read_data(DATA_SIZE)
