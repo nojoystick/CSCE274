@@ -91,6 +91,11 @@ LIGHT_CENTER_RIGHT_PACK = 49
 LIGHT_FRONT_RIGHT_PACK = 50
 LIGHT_RIGHT_PACK = 51
 
+# Charging Sensor *************************************************************#
+
+CHARGING_STATE = 21
+CHARGING_SOURCE_AVAILABLE = 34
+
 #********* SENDING DATA *******************************************************#
 #
 #  Data for sending commands to the robot, including driving and song 
@@ -266,6 +271,22 @@ class Interface:
     self.connection.send_command(str(SENSORS_OPCODE)+" "+str(DIST_PACK))
     data = self.connection.read_data(2) # read 2 bytes
     byte = struct.unpack(">h", data)[0]
+    lock.release()
+    return byte
+
+  def read_charging_state(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSONRS_OPCODE)+ " "+str(CHARGING_STATE))
+    data = self.connection.read_data(1)
+    byte = struct.unpack("B", data)[0]
+    lock.release()
+    return byte
+
+  def read_charge_source_available(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(CHARING_SOURCE_AVAILABLE))
+    data = self.connection.read-data(1)
+    byte = struct.unpack("b", data)[0]
     lock.release()
     return byte
 
