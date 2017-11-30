@@ -81,7 +81,9 @@ VIRTUAL_WALL = 13
 
 # Infrared Sensor *************************************************************#
 
-INFRARED_PACK = 17 # Omnidirectional infrared beacon
+INFRARED_OMNI = 17 # Omnidirectional infrared beacon
+INFRARED_LEFT = 52
+INFRARED_RIGHT = 53
 LIGHT_LEFT_PACK = 46 
 LIGHT_FRONT_LEFT_PACK = 47 
 LIGHT_CENTER_LEFT_PACK = 48
@@ -269,9 +271,25 @@ class Interface:
 
   def read_ir_omni(self):
     lock.acquire()
-    self.connection.send_command(str(SENSORS_OPCODE)+ " " +str(INFRARED_PACK))
+    self.connection.send_command(str(SENSORS_OPCODE)+ " " +str(INFRARED_OMNI))
     data = self.connection.read_data(1)
     byte = struct.unpack("B", data)[0]
+    lock.release()
+    return byte
+
+  def read_ir_left(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(INFRARED_LEFT))
+    data = self.connection.read_data(1)
+    byte = struct.unpack('B',data)[0]
+    lock.release()
+    return byte
+
+  def read_ir_right(self):
+    lock.acquire()
+    self.connection.send_command(str(SESNORS_OPCODE)+ " "+str(INFRARED_RIGHT))
+    data = self.connection.read_data(1)
+    byte = struct.unpack('B', data)[0]
     lock.release()
     return byte
 
