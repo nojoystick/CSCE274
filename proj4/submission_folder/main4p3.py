@@ -60,6 +60,8 @@ def FollowWall():
         #sys.exit()?
         #sleep?
       #elif here checking infrared values are all 0 so use the PD controller?
+      #elif ir_omni is 0 and ir_right is 0 and ir_left is 0:
+        #put wall following algorithm here
       elif wheelDrop:
         connection.stop()
         connection.song()
@@ -79,8 +81,6 @@ def FollowWall():
         connection.obstacle()
       #elif something about checking infrared sensors
       #elif something about diffeent infrared values
-      #how many elif do we need? Answe: Gotta test to figure it out
-      #what to do if all the omni values are 0? <<<< Does this matter? If we say drive(x,y) its overwitten immediately by the wall algorithm::: maybe move this up to above comment
     
       # Call to the PD controller. Most of these values have been tweaked using trial and error along multiple wall designs. USE THIS UNTIL INFARED IS DETECTED
       # Perhaps move this segment of code into an elif right after my comment above
