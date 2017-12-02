@@ -19,6 +19,14 @@ LSPEED = 0
 RSPEED = 0
 FOUND_DOCK = False
 
+FIELD = 161
+GREEN = 164
+GREEN_FIELD = 165
+RED = 168
+RED_FIELD = 169
+RED_GREEN = 172
+RGFIELD = 173
+
 # Creating a logger to log Roomba events
 logger = logging.getLogger('Roomba_Events')
 logger.setLevel(logging.DEBUG)
@@ -48,66 +56,60 @@ def FollowWall():
   FOUND_DOCK = False
   charging = connection.read_charging_state()
   dock = connection.read_charge_source_available()
+
+# Case: robot is not moving and on dock or charging
+# Play a song and terminate the program 
   if dock is not 0 or charging is not 0:
-    connection.drive_direct(0,0)
-    #turn the robot off
+    connection.stop()
     connection.song()
     print "Quitting"
     quit()
-    #sleep?
+# Case: not on dock or charging
+# Execute wall following algorithm in while loop 
   elif dock is 0 or charging is 0:
     while MOVING:
       print str(FOUND_DOCK)
       # Reset driving speed to drive straight every iteration after the correction.
       LSPEED = 50
       RSPEED = 50
+    # Read dock sensors
       ir_omni = connection.read_ir_omni()
       print "OM"+str(ir_omni)
       ir_right = connection.read_ir_right()
       print "R"+str(ir_right)
       ir_left = connection.read_ir_left()
       print "L"+str(ir_left)
-      if ir_omni is 172 or (ir_right is 168 and ir_left is 164):
+      if ir_omni is RED_GREEN or (ir_right is RED and ir_left is GREEN):
         FOUND_DOCK = True
+    # Read for charging and dock
+      charging = connection.read_charging_state()
+      dock = connection.read_charge_source_available()
+      print "C2"+str(charging)
+      print "D2" + str(dock)
 
-      charging2 = connection.read_charging_state()
-      dock2 = connection.read_charge_source_available()
-      print "C2"+str(charging2)
-      print "D2" + str(dock2)
       connection.drive_direct(RSPEED,LSPEED)
       wheelDrop,bumpRight,bumpLeft = connection.bump_wheel_drop()
       logger.info("Infrared O/R/L: %s/%s/%s",ir_omni,ir_right,ir_left)
       logger.info("Charging and Docking C/D: %s/%s", charging2, dock2)
-      if charging2 is not 0 or dock2 is not 0:
-        connection.drive_direct(0,0)
-        #turn the robot off
+      
+    # Case: robot was moving and is on dock or charging
+      if charging is not 0 or dock is not 0:
+        connection.stop()
         connection.song()
         print "Quitting 2"
         quit()
-        #sleep?
-      #elif here checking infrared values are all 0 so use the PD controller?
-      #elif ir_omni is 0 and ir_right is 0 and ir_left is 0 or FOUND_DOCK is False:
-       # u = pd()
-        #if u > 14:
-         # LSPEED = 30
-         # RSPEED = 20
-        #elif (u >= 9 and u <= 11):
-         # LSPEED = 150 + u
-          #RSPEED = 35 - u
-        #else:
-         # LSPEED = 35 + u
-         # RSPEED = 35 - u
-        #if MOVING:
-         # connection.drive_direct(RSPEED,LSPEED)
-         # connection.tpause(st)
+    # Case: wheel drop detected
       elif wheelDrop:
         connection.stop()
         connection.song()
         MOVING = False
         break
+    # Case: cliff detected
       elif cliff != 0:
         connection.stop()
         connection.obstacle()
+    # Case: Bump sensed left, right, or both
+    # Bump sensor is turned off if the dock has been found
       elif bumpLeft and FOUND_DOCK is False:
         connection.stop()
         connection.turnClockwise()
@@ -117,7 +119,7 @@ def FollowWall():
       elif bumpLeft and bumpRight and FOUND_DOCK is False:
         connection.stop()
         connection.obstacle()
-      #elif something about checking infrared sensors
+    # Case: Dock has not been found; execute wall following PD 
       elif FOUND_DOCK is False:
         u = pd()
         if u > 14:
@@ -132,58 +134,30 @@ def FollowWall():
         if MOVING:
           connection.drive_direct(RSPEED,LSPEED)
           connection.tpause(st)
-      elif ir_left is 164: #or ir_omni is 169:
+    # Case: Reads green buoy, turns right
+      elif ir_left is GREEN: #or ir_omni is 169:
         FOUND_DOCK = True
         print "TURN RIGHT"
         connection.drive_direct(5,85)
-      elif ir_right is 168: #or ir_omni is 165:
+    # Case: Reads red buoy, turns left
+      elif ir_right is RED: #or ir_omni is 165:
         FOUND_DOCK = True
         print "TURN LEFT"
         connection.drive_direct(85,5)
-      elif ir_omni is 172 or ir_omni is 173 or ir_right is 172 or ir_right is 173 or ir_left is 172 or ir_left is 173:
+    # Case: Reads both, drive straight very slowly
+      elif ir_omni is RED_GREEN or ir_omni is RGFIELD or ir_right is RED_GREEN or ir_right is RGFIELD or ir_left is RED_GREEN or ir_left is RGFIELD:
         FOUND_DOCK = True
         print "GO STRAIGHT"
         connection.drive_direct(1,1)
-        connection.drive_direct(0,0)
-      #elif something about diffeent infrared values
+        connection.stop()
 
-      #if wheelDrop:
-       # connection.stop()
-        #connection.song()
-        #MOVING = False
-        #break
-      #if cliff != 0:
-       # connection.stop()
-        #connection.obstacle()
-      #if bumpLeft:
-       # connection.stop()
-       # connection.turnClockwise()
-      #if bumpRight:
-       # connection.stop()
-       # connection.turnCounterClockwise()
-      #if bumpLeft and bumpRight:
-       # connection.stop()
-        #connection.obstacle()
-    
-      # Call to the PD controller. Most of these values have been tweaked using trial and error along multiple wall designs. USE THIS UNTIL INFARED IS DETECTED
-      # Perhaps move this segment of code into an elif right after my comment above
-      #u = pd()
-      #if u > 14:
-       # LSPEED = 30
-        #RSPEED = 20
-      #elif (u >= 9 and u <= 11):
-       # LSPEED = 150 + u
-        #RSPEED = 35 - u
-     # else:
-      #  LSPEED = 35 + u
-       # RSPEED = 35 - u
-      #if MOVING:
-       # connection.drive_direct(RSPEED,LSPEED)
-        #connection.tpause(st)
+###############################################################################
 
+# Connect to state interface and set to full mode
 connection = state_interface.Interface()
 connection.set_full()
 
+# Initialize thread
 while True: 
   cleanDetect = connection.read_button(connection.getClean())
   wheelDrop, bumpLeft, bumpRight = connection.bump_wheel_drop()
