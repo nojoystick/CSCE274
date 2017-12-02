@@ -18,6 +18,15 @@ kd = .002 # Derivative Gain
 LSPEED = 0
 RSPEED = 0
 
+# Creating a logger to log Roomba events
+logger = logging.getLogger('Roomba_Events')
+logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler('Roomba_Events.log')
+fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s, %(message)s')
+fh.setFormatter(formatter)
+logger.addHandler(fh)
+
 # - PID Controller - Returns a value based off of sensor data.  Returned value determines what to do
 def pd():
   global le
@@ -39,6 +48,7 @@ def FollowWall():
   if dock is not 0 or charging is not 0:
     connection.drive_direct(0,0)
     #turn the robot off
+    connection.song()
     print "Quitting"
     quit()
     #sleep?
@@ -59,10 +69,12 @@ def FollowWall():
       print "D2" + str(dock2)
       connection.drive_direct(RSPEED,LSPEED)
       wheelDrop,bumpRight,bumpLeft = connection.bump_wheel_drop()
-      
+      logger.info("Infrared O/R/L: %s/%s/%s",ir_omni,ir_right,ir_left)
+      logger.info("Charging and Docking C/D: %s/%s", charging2, dock2)
       if charging2 is not 0 or dock2 is not 0:
         connection.drive_direct(0,0)
         #turn the robot off
+        connection.song()
         print "Quitting 2"
         quit()
         #sleep?
