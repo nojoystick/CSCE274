@@ -274,7 +274,7 @@ class Interface:
 
   def read_charging_state(self):
     lock.acquire()
-    self.connection.send_command(str(SENSONRS_OPCODE)+ " "+str(CHARGING_STATE))
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(CHARGING_STATE))
     data = self.connection.read_data(1)
     byte = struct.unpack("B", data)[0]
     lock.release()
@@ -282,8 +282,8 @@ class Interface:
 
   def read_charge_source_available(self):
     lock.acquire()
-    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(CHARING_SOURCE_AVAILABLE))
-    data = self.connection.read-data(1)
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(CHARGING_SOURCE_AVAILABLE))
+    data = self.connection.read_data(1)
     byte = struct.unpack("b", data)[0]
     lock.release()
     return byte
@@ -306,7 +306,7 @@ class Interface:
 
   def read_ir_right(self):
     lock.acquire()
-    self.connection.send_command(str(SESNORS_OPCODE)+ " "+str(INFRARED_RIGHT))
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(INFRARED_RIGHT))
     data = self.connection.read_data(1)
     byte = struct.unpack('B', data)[0]
     lock.release()
