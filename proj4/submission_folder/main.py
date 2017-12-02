@@ -95,7 +95,7 @@ def FollowWall():
       connection.drive_direct(RSPEED,LSPEED)
       wheelDrop,bumpRight,bumpLeft = connection.bump_wheel_drop()
       logger.info("Infrared O/R/L: %s/%s/%s",ir_omni,ir_right,ir_left)
-      logger.info("Charging and Docking C/D: %s/%s", charging2, dock2)
+      logger.info("Charging and Docking C/D: %s/%s", charging, dock)
       
     # Case: robot was moving and is on dock or charging
       if charging is not 0 or dock is not 0:
