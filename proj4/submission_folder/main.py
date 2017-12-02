@@ -79,8 +79,13 @@ def FollowWall():
       print "R"+str(ir_right)
       ir_left = connection.read_ir_left()
       print "L"+str(ir_left)
+
       if ir_omni is RED_GREEN or (ir_right is RED and ir_left is GREEN):
         FOUND_DOCK = True
+      
+      if (ir_omni is RED and ir_left is GREEN) or (ir_omni is GREEN and ir_right is RED):
+        FOUND_DOCK = True
+
     # Read for charging and dock
       charging = connection.read_charging_state()
       dock = connection.read_charge_source_available()
@@ -135,15 +140,23 @@ def FollowWall():
           connection.drive_direct(RSPEED,LSPEED)
           connection.tpause(st)
     # Case: Reads green buoy, turns right
-      elif ir_left is GREEN: #or ir_omni is 169:
+      elif ir_left is GREEN or ir_omni is GREEN: #or ir_omni is 169:
         FOUND_DOCK = True
         print "TURN RIGHT"
         connection.drive_direct(5,85)
     # Case: Reads red buoy, turns left
-      elif ir_right is RED: #or ir_omni is 165:
+      elif ir_right is RED or ir_omni is RED: #or ir_omni is 165:
         FOUND_DOCK = True
         print "TURN LEFT"
         connection.drive_direct(85,5)
+      elif ir_right is GREEN:
+        FOUND_DOCK = True
+        print "HARD RIGHT"
+        connection.drive_direct(130,5)
+      elif ir_left is RED:
+        FOUND_DOCK = True
+        print "HARD LEFT"
+        connection.drive_direct(5,130)
     # Case: Reads both, drive straight very slowly
       elif ir_omni is RED_GREEN or ir_omni is RGFIELD or ir_right is RED_GREEN or ir_right is RGFIELD or ir_left is RED_GREEN or ir_left is RGFIELD:
         FOUND_DOCK = True
