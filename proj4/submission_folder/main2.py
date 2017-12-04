@@ -89,12 +89,18 @@ def FollowWall():
       while charging is not 0 or dock is not 0:
         while(ir_right is not RED):
           connection.drive_direct(-10,10) # arbitrary speed; adjust later
+          ir_right = connection.read_ir_right();
         while(ir_left is not GREEN):
           connection.drive_direct(10,-10)
+          ir_left = connection.read_ir_left();
         while(ir_omni is not RED_GREEN):
           connection.drive_direct(-10,10)
+          ir_omni = connection.read_ir_omni();
         connection.drive_direct(1,1)
         connection.tpause(1) # drive forward for 1 second; adjust later
+        charging = connection.read_charging_state();
+        dock = connection.read_charging_source_available();
+
 
     # Case: robot was moving and is on dock or charging
       if charging is not 0 or dock is not 0:
