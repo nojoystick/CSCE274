@@ -92,7 +92,7 @@ def FollowWall():
           else:
             connection.drive_direct(10,1)
           charging = connection.read_charging_state();
-          dock = connection.read_charging_source_available();
+          dock = connection.read_charge_source_available();
 
       # Case: robot was moving and is on dock or charging
       if charging is not 0 or dock is not 0:
