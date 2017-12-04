@@ -85,36 +85,28 @@ def FollowWall():
       logger.info("Charging and Docking C/D: %s/%s", charging, dock)
     
     # Case: detects dock
-    if ir_right is not 0 or ir_left is not 0 or ir_omni is not 0:
-      while charging is not 0 or dock is not 0:
-        while(ir_right is not RED):
-          connection.drive_direct(-10,10) # arbitrary speed; adjust later
-          ir_right = connection.read_ir_right();
-        while(ir_left is not GREEN):
-          connection.drive_direct(10,-10)
-          ir_left = connection.read_ir_left();
-        while(ir_omni is not RED_GREEN):
-          connection.drive_direct(-10,10)
-          ir_omni = connection.read_ir_omni();
-        connection.drive_direct(1,1)
-        connection.tpause(1) # drive forward for 1 second; adjust later
-        charging = connection.read_charging_state();
-        dock = connection.read_charging_source_available();
+      if ir_omni is RED_GREEN or RGFIELD:
+        while charging is 0 or dock is 0:
+          if(ir_left is GREEN and ir_right is RED):
+            connection.drive_direct(1,1)
+          else:
+            connection.drive_direct(10,1)
+          charging = connection.read_charging_state();
+          dock = connection.read_charging_source_available();
 
-
-    # Case: robot was moving and is on dock or charging
+      # Case: robot was moving and is on dock or charging
       if charging is not 0 or dock is not 0:
         connection.stop()
         connection.song()
         print "Quitting 2"
         quit()
-    # Case: wheel drop detected
+      # Case: wheel drop detected
       elif wheelDrop:
         connection.stop()
         connection.song()
         MOVING = False
         break
-    # Case: cliff detected
+      # Case: cliff detected
       elif cliff != 0:
         connection.stop()
         connection.obstacle()
@@ -131,20 +123,19 @@ def FollowWall():
         connection.obstacle()
     
     # Case: Dock has not been found; execute wall following PD 
-      elif FOUND_DOCK is False:
-        u = pd()
-        if u > 14:
-          LSPEED = 30
-          RSPEED = 20
-        elif (u >= 9 and u <= 11):
-          LSPEED = 150 + u
-          RSPEED = 35 - u
-        else:
-          LSPEED = 35 + u
-          RSPEED = 35 - u
-        if MOVING:
-          connection.drive_direct(RSPEED,LSPEED)
-          connection.tpause(st)
+      u = pd()
+      if u > 14:
+        LSPEED = 30
+        RSPEED = 20
+      elif (u >= 9 and u <= 11):
+        LSPEED = 150 + u
+        RSPEED = 35 - u
+      else:
+        LSPEED = 35 + u
+        RSPEED = 35 - u
+      if MOVING:
+        connection.drive_direct(RSPEED,LSPEED)
+        connection.tpause(st)
 
 ###############################################################################
 
