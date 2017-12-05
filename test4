@@ -1,0 +1,59 @@
+# Imports
+from Tkinter import *
+import struct
+import serial
+
+#Global variables
+connection = None
+
+velocity = 200
+rotation = 300
+
+def sendCommand():
+    global connection
+
+    try:
+        if connection is not None:
+            command1 = input( "What command would you like to send to the robot?")
+            connection.write(chr(command1))
+            #connection.write('140 3 1 64 16 141 3')
+        else:
+            print "Not Connected!"
+    except serial.SerialException:
+            print "Connection has been lost!"
+            connection = None
+
+def sendCommandRaw(command):
+    global connection
+    connection.write(command)
+    
+#Connection
+def onConnect():
+    global connection
+
+    port = '/dev/ttyUSB0'
+    
+    try:
+        connection = serial.Serial('/dev/ttyUSB0', baudrate=115200, timeout=1)
+        print "Connection Successful"
+    except serial.SerialException:
+        print "Connection failed"
+
+def onQuit():
+    root.destroy()
+    
+def Drive():
+    vr = velocity + (rotation/2)
+    vl = velocity - (rotation/2)
+    cmd = struct.pack(">Bhh", 145, vr, vl)
+    sendCommandRaw(cmd)
+
+#Keyboard commands
+#root.bind("<Key>", KeyInput)
+#root.bind("<KeyRelease>", KeyInput)
+
+#Main loop executed
+#root.mainloop()
+onConnect()
+sendCommand()
+Drive()
