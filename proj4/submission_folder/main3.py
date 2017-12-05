@@ -6,7 +6,7 @@ import random
 MOVING = False # Is the robot currently moving
 LSPEED = 0
 RSPEED = 0
-DOCK = 0
+DOCK = False
 
 ###############################################################################
 # FOLLOW WALL
@@ -18,10 +18,12 @@ def FollowWall():
   global RSPEED
   global DOCK
 
-  while (DOCK == 0):
+  while (DOCK == False):
   #  Reset driving speed to drive straight every iteration after the correction.
     LSPEED = 50
     RSPEED = 50
+    # If omni sees rg, dock is found; stop wall following behavior
+    DOCK = connection.is_omni_rg()
     # Case: wheel drop detected
     if wheelDrop:
       connection.stop()
@@ -76,17 +78,19 @@ def FindDock():
     print "R"+str(ir_omni_red)
     is_left_green = connection.read_is_left_green()
     print "L"+str(ir_omni_left)
- 
-    if(is_omni_rg):
-      DOCK = 1
 
-    if(DOCK == 1):
+    if(DOCK == True):
       while(is_left_green and is_right_red):
         print "STRAIGHT"
         connection.drive_direct(30,30)
         connection.stop()
         is_left_green = connection.is_left_green()
         is_right_red = connection.is_right_red()
+        charging = connection.read_charging_state()
+        if(charging):
+         connection.stop()
+         connection.song() 
+         quit()
       while(not is_left_green and not is_left_red):
         print "CIRCLE"
         # maybe include some randomness here to make it do more of a zigzag
@@ -94,7 +98,8 @@ def FindDock():
         dock = connection.read_charge_source_available()
         is_left_green = connection.is_left_green()
         is_right_red = connection.is_right_red()  
-        print "OUTSIDE IFs"
+      print "OUTSIDE IFs"
+      
 
 ###############################################################################
 # THREAD MANAGEMENT
@@ -104,52 +109,47 @@ connection = state_interface.Interface()
 connection.set_full()
 lock = threading.Lock()
 
-t1 = threading.Thread(name = 'FollowWall', target = 'FollowWall')
-t2 = threading.Thread(name = 'FindDock', target = 'FindDock')
-#t3 = threading.Thread(name = 'FollowWall', target = '')
+wallThread = threading.Thread(name = 'FollowWall', target = 'FollowWall')
+dockThread = threading.Thread(name = 'FindDock', target = 'FindDock')
 
-t1.start()
-t2.start()
 
-#
 # Initialize threads
-# while True: 
-#  cleanDetect = connection.read_button(connection.getClean())
-#  wheelDrop, bumpLeft, bumpRight = connection.bump_wheel_drop()
-#  cliff = connection.read_cliff()
-#  ir_omni_is_rg = connection.is_omni_rg()
-#  charging = connection.read_charging_state()
-#  dock = connection.read_charging_source_available()
+ while True: 
+  cleanDetect = connection.read_button(connection.getClean())
+  wheelDrop, bumpLeft, bumpRight = connection.bump_wheel_drop()
+  cliff = connection.read_cliff()
+  ir_omni_is_rg = connection.is_omni_rg()
+  charging = connection.read_charging_state()
+  dock = connection.read_charging_source_available()
 
 # Case: not moving and clean button is pressed
 # Start wall following thread
-#  if not MOVING and not wheelDrop and cliff == 0 and cleanDetect:
-#    wallThread = threading.Thread(target=FollowWall)
-#    MOVING = True
-#    wallThread.start()
+  if not MOVING and not wheelDrop and cliff == 0 and cleanDetect:
+    wallThread = threading.Thread(target=FollowWall)
+    MOVING = True
+    wallThread.start()
 
 # Case: omni sensor detects red and green beams 
 # Stop wall following thread
 # Start dock finding thread
-#  elif ir_omni_is_rg:
-#    wallThread.stop()
-#    dockThread = threading.Thread(target=FindDock)
-#    dockThread.start()
+  elif ir_omni_is_rg:
+    wallThread.stop()
+    dockThread = threading.Thread(target=FindDock)
+    dockThread.start()
 
 # Case: moving and clean button is pressed
 # Stop any active threads  
-#  elif MOVING and cleanDetect:
-#    MOVING = False
-#    wallThread.stop()
-#    dockThread.stop()
-#    connection.stop()
+  elif MOVING and cleanDetect:
+    MOVING = False
+    wallThread.stop()
+    dockThread.stop()
+    connection.stop()
 
 # Case: charging or dock are detected
 # Stop finding dock thread
 # Quit program
-#  elif charging is not 0 or dock is not 0:
-#    MOVING = False
-#    dockThread.stop()
-#    connection.stop()
-#    quit()
-
+  elif charging is not 0 or dock is not 0:
+    MOVING = False
+    dockThread.stop()
+    connection.stop()
+    quit()
