@@ -96,6 +96,15 @@ LIGHT_RIGHT_PACK = 51
 CHARGING_STATE = 21
 CHARGING_SOURCE_AVAILABLE = 34
 
+# Dock Sensing ****************************************************************#
+FIELD = 161
+GREEN = 164
+GREEN_FIELD = 165
+RED = 168
+RED_FIELD = 169
+RED_GREEN = 172
+RGFIELD = 173
+
 #********* SENDING DATA *******************************************************#
 #
 #  Data for sending commands to the robot, including driving and song 
@@ -130,7 +139,15 @@ MIN_RADIUS = -2000
 DRIVE_COMMAND = "137"
 DIRECT_COMMAND = "145"
 
-# Random **********************************************************************#
+# pd set points ***************************************************************#
+sp = 700 # Set point
+pe = 0 # Past Error
+le = 0 # Last Error
+st = .5 # Sampling Time
+kp = .016 # Proportional Gain
+kd = .002 # Derivative Gain
+
+# Randomness bounds for obstacle functions ************************************#
 SPEED = 100;
 LOWANG = -15;
 HIGHANG = 15;
@@ -296,6 +313,13 @@ class Interface:
     lock.release()
     return byte
 
+  def is_omni_rg(self):
+    data = self.read_ir_omni()
+    if data is RED_GREEN or data is RG_FIELD:
+      return true
+    else:
+      return false
+
   def read_ir_left(self):
     lock.acquire()
     self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(INFRARED_LEFT))
@@ -304,6 +328,13 @@ class Interface:
     lock.release()
     return byte
 
+  def is_left_green(self):
+    data = self.read_ir_left()
+    if data is GREEN:
+      return true
+    else:
+      return false
+
   def read_ir_right(self):
     lock.acquire()
     self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(INFRARED_RIGHT))
@@ -311,6 +342,13 @@ class Interface:
     byte = struct.unpack('B', data)[0]
     lock.release()
     return byte
+
+  def is_right_red(self):
+    data = self.read_ir_right()
+    if data is RED:
+      return true
+    else:
+      return false
 
   def read_light_left(self):
     lock.acquire()
@@ -503,7 +541,7 @@ class Interface:
 # backUp - drives backwards for 1.5 seconds
 # obstacle - the robot's action when it hits an obstacle. Drives backwards for
 #             1.5 seconds and then turns at a random angle +- 90 deg
-#
+# pd - a pd controller for the wall-following algorithm
 #******************************************************************************#
 
   def randomAngle(self,low, high):
@@ -534,3 +572,13 @@ class Interface:
       self.turnCounterClockwise()
     else:
       self.turnClockwise()
+
+  def pd():
+    global le
+    global pe
+    e = sp - connection.read_light_right() - 10*connection.read_light_front_right() - 10*connection.read_light_center_right() #Error
+    P = kp*e                      # Proportional Controller
+    D = kd*( e - le )/st          # Derivative Controller
+    u = P  + D                    # Controller Output
+    le = e                        # Updates last error
+    return int(u)
