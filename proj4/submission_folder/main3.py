@@ -114,7 +114,7 @@ dockThread = threading.Thread(name = 'FindDock', target = 'FindDock')
 
 
 # Initialize threads
- while True: 
+while True: 
   cleanDetect = connection.read_button(connection.getClean())
   wheelDrop, bumpLeft, bumpRight = connection.bump_wheel_drop()
   cliff = connection.read_cliff()
