@@ -5,26 +5,8 @@ import logging
 
 #Global Constants
 MOVING = False # Is the robot currently moving
-LOWANG = -30 # Lowest number in range
-HIGHANG = 30 # Highest number in range
-TURNANG = 180 # Default angle for robot to turn when it bumbs/detects a cliff
-SPEED = 100 # Speed to use for all robot movements
-sp = 700 # Set point
-pe = 0 # Past Error
-le = 0 # Last Error
-st = .5 # Sampling Time
-kp = .016 # Proportional Gain
-kd = .002 # Derivative Gain
 LSPEED = 0
 RSPEED = 0
-
-FIELD = 161
-GREEN = 164
-GREEN_FIELD = 165
-RED = 168
-RED_FIELD = 169
-RED_GREEN = 172
-RGFIELD = 173
 
 # Creating a logger to log Roomba events
 logger = logging.getLogger('Roomba_Events')
@@ -41,9 +23,9 @@ def pd():
   global pe
   e = sp - connection.read_light_right() - 10*connection.read_light_front_right() - 10*connection.read_light_center_right() #Error
   P = kp*e     					# Proportional Controller
-  D = kd*( e - le )/st      	# Derivative Controller
+  D = kd*( e - le )/st      			# Derivative Controller
   u = P  + D     	  			# Controller Output
-  le = e						# Updates last error
+  le = e					# Updates last error
   return int(u)			  	
 
 
@@ -70,11 +52,11 @@ def FollowWall():
       LSPEED = 50
       RSPEED = 50
     # Read dock sensors
-      ir_omni = connection.read_ir_omni()
+      is_omni_rg = connection.is_omni_rg()
       print "OM"+str(ir_omni)
-      ir_right = connection.read_ir_right()
+      is_right_red = connection.is_right_red()
       print "R"+str(ir_right)
-      ir_left = connection.read_ir_left()
+      is_left_green = connection.is_left_green()
       print "L"+str(ir_left)
 
     # Read for charging and dock
@@ -85,11 +67,11 @@ def FollowWall():
       logger.info("Charging and Docking C/D: %s/%s", charging, dock)
     
     # Case: detects dock
-      if ir_omni is RED_GREEN or ir_omni is RGFIELD:
+      if connection.is_omni_rg():
         print "OMNI IS REDGREEN"
         while charging is 0 or dock is 0:
           print "WHILE"
-          while(ir_left is GREEN and ir_right is RED) and dock is 0:
+          while(is_left_green and is_left_red) and dock is 0:
             print "STRAIGHT"
             connection.drive_direct(30,30)
             #connection.stop()
@@ -100,12 +82,12 @@ def FollowWall():
             #print ""
             #print "LEFT"+str(ir_left)
             #print ""
-          while(ir_left is not GREEN or ir_right is not RED) and dock is 0:
+          while(not is_left_green and not is_right_red) and dock is 0:
             print "CIRCLE"
             connection.drive_direct(100,30)
             dock = connection.read_charge_source_available()
-            ir_left = connection.read_ir_left()
-            ir_right = connection.read_ir_right()
+            is_left_green = connection.is_left_green()
+            is_right_red = connection.is_right_red()
             print "RIGHT" + str(ir_right)
             print ""
             print "LEFT" +str(ir_left)
@@ -143,7 +125,7 @@ def FollowWall():
         connection.obstacle()
     
     # Case: Dock has not been found; execute wall following PD 
-      u = pd()
+      u = connection.pd()
       if u > 14:
         LSPEED = 30
         RSPEED = 20
