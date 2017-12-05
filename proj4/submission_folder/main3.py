@@ -11,50 +11,51 @@ RSPEED = 0
 # FOLLOW WALL
 #
 def FollowWall():
-  global MOVING
-  global LSPEED
-  global RSPEED
+  print "FOLLOW WALL"
+  #global MOVING
+  #global LSPEED
+  #global RSPEED
 
-  while 1:
+  #while 1:
    # Reset driving speed to drive straight every iteration after the correction.
-    LSPEED = 50
-    RSPEED = 50
+  #  LSPEED = 50
+  #  RSPEED = 50
     # Case: wheel drop detected
-    if wheelDrop:
-      connection.stop()
-      connection.song()
-      MOVING = False
-      break
+  #  if wheelDrop:
+  #    connection.stop()
+  #    connection.song()
+  #    MOVING = False
+  #    break
     # Case: cliff detected
-    elif cliff != 0:
-      connection.stop()
-      connection.obstacle()
+  #  elif cliff != 0:
+  #    connection.stop()
+  #    connection.obstacle()
     # Case: Bump sensed left, right, or both
     # Bump sensor is turned off if the dock has been found
-    elif bumpLeft:
-      connection.stop()
-      connection.turnClockwise()
-    elif bumpRight:
-      connection.stop()
-      connection.turnCounterClockwise()
-    elif bumpLeft and bumpRight:
-      connection.stop()
-      connection.obstacle()
+  #  elif bumpLeft:
+  #    connection.stop()
+  #    connection.turnClockwise()
+  #  elif bumpRight:
+  #    connection.stop()
+  #    connection.turnCounterClockwise()
+  #  elif bumpLeft and bumpRight:
+  #    connection.stop()
+  #    connection.obstacle()
     
     # Case: Dock has not been found; execute wall following PD 
-    u = connection.pd()
-    if u > 14:
-      LSPEED = 30
-      RSPEED = 20
-    elif (u >= 9 and u <= 11):
-      LSPEED = 150 + u
-      RSPEED = 35 - u
-    else:
-      LSPEED = 35 + u
-      RSPEED = 35 - u
-    if MOVING:
-      connection.drive_direct(RSPEED,LSPEED)
-      connection.tpause(st)
+ #   u = connection.pd()
+ #   if u > 14:
+ #     LSPEED = 30
+ #     RSPEED = 20
+ #   elif (u >= 9 and u <= 11):
+ #     LSPEED = 150 + u
+ #     RSPEED = 35 - u
+ #   else:
+ #     LSPEED = 35 + u
+ #     RSPEED = 35 - u
+ #   if MOVING:
+ #     connection.drive_direct(RSPEED,LSPEED)
+ #     connection.tpause(st)
 
 ###############################################################################
 # DOCKING THREAD
@@ -62,30 +63,31 @@ def FollowWall():
 # It runs until the dock is found or charging is detected.
 #
 def FindDock():
-  while 1:
-    print "OMNI IS REDGREEN"
-    # Read dock sensors
-    is_omni_rg = connection.is_omni_rg()
-    print "OM"+str(is_omni_rg)
-    is_right_red = connection.is_right_red()
-    print "R"+str(ir_omni_red)
-    is_left_green = connection.read_is_left_green()
-    print "L"+str(ir_omni_left)
-
-    while(is_left_green and is_right_red):
-      print "STRAIGHT"
-      connection.drive_direct(30,30)
-      connection.stop()
-      is_left_green = connection.is_left_green()
-      is_right_red = connection.is_right_red()
-    while(not is_left_green and not is_left_red):
-      print "CIRCLE"
-      # maybe include some randomness here to make it do more of a zigzag
-      connection.drive_direct(100,30)
-      dock = connection.read_charge_source_available()
-      is_left_green = connection.is_left_green()
-      is_right_red = connection.is_right_red()  
-      print "OUTSIDE IFs"
+ print("FIND DOCK")
+ # while 1:
+ #   print "OMNI IS REDGREEN"
+ #   # Read dock sensors
+ #   is_omni_rg = connection.is_omni_rg()
+ #   print "OM"+str(is_omni_rg)
+ #   is_right_red = connection.is_right_red()
+ #   print "R"+str(ir_omni_red)
+ #   is_left_green = connection.read_is_left_green()
+ #   print "L"+str(ir_omni_left)
+ 
+ #   while(is_left_green and is_right_red):
+ #     print "STRAIGHT"
+ #     connection.drive_direct(30,30)
+ #     connection.stop()
+ #     is_left_green = connection.is_left_green()
+ #     is_right_red = connection.is_right_red()
+ #   while(not is_left_green and not is_left_red):
+ #     print "CIRCLE"
+ #     # maybe include some randomness here to make it do more of a zigzag
+ #     connection.drive_direct(100,30)
+ #     dock = connection.read_charge_source_available()
+ #     is_left_green = connection.is_left_green()
+ #     is_right_red = connection.is_right_red()  
+ #     print "OUTSIDE IFs"
 
 ###############################################################################
 # THREAD MANAGEMENT
