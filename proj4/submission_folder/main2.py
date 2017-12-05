@@ -85,12 +85,32 @@ def FollowWall():
       logger.info("Charging and Docking C/D: %s/%s", charging, dock)
     
     # Case: detects dock
-      if ir_omni is RED_GREEN or RGFIELD:
+      if ir_omni is RED_GREEN or ir_omni is RGFIELD:
+        print "OMNI IS REDGREEN"
         while charging is 0 or dock is 0:
-          if(ir_left is GREEN and ir_right is RED):
-            connection.drive_direct(1,1)
-          else:
-            connection.drive_direct(10,1)
+          print "WHILE"
+          while(ir_left is GREEN and ir_right is RED) and dock is 0:
+            print "STRAIGHT"
+            connection.drive_direct(30,30)
+            #connection.stop()
+            dock = connection.read_charge_source_available()
+            #ir_left = connection.read_ir_left()
+            #ir_right = connection.read_ir_right()
+            #print "RIGHT"+str(ir_right)
+            #print ""
+            #print "LEFT"+str(ir_left)
+            #print ""
+          while(ir_left is not GREEN or ir_right is not RED) and dock is 0:
+            print "CIRCLE"
+            connection.drive_direct(100,30)
+            dock = connection.read_charge_source_available()
+            ir_left = connection.read_ir_left()
+            ir_right = connection.read_ir_right()
+            print "RIGHT" + str(ir_right)
+            print ""
+            print "LEFT" +str(ir_left)
+            print ""
+          print "OUTSIDE IFs"
           charging = connection.read_charging_state();
           dock = connection.read_charge_source_available();
 

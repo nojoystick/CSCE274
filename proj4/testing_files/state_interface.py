@@ -81,13 +81,20 @@ VIRTUAL_WALL = 13
 
 # Infrared Sensor *************************************************************#
 
-INFRARED_PACK = 17 # Omnidirectional infrared beacon
+INFRARED_OMNI = 17 # Omnidirectional infrared beacon
+INFRARED_LEFT = 52
+INFRARED_RIGHT = 53
 LIGHT_LEFT_PACK = 46 
 LIGHT_FRONT_LEFT_PACK = 47 
 LIGHT_CENTER_LEFT_PACK = 48
 LIGHT_CENTER_RIGHT_PACK = 49
 LIGHT_FRONT_RIGHT_PACK = 50
 LIGHT_RIGHT_PACK = 51
+
+# Charging Sensor *************************************************************#
+
+CHARGING_STATE = 21
+CHARGING_SOURCE_AVAILABLE = 34
 
 #********* SENDING DATA *******************************************************#
 #
@@ -267,11 +274,43 @@ class Interface:
     lock.release()
     return byte
 
-  def read_ir_omni(self):
+  def read_charging_state(self):
     lock.acquire()
-    self.connection.send_command(str(SENSORS_OPCODE)+ " " +str(INFRARED_PACK))
+    self.connection.send_command(str(SENSONRS_OPCODE)+ " "+str(CHARGING_STATE))
     data = self.connection.read_data(1)
     byte = struct.unpack("B", data)[0]
+    lock.release()
+    return byte
+
+  def read_charge_source_available(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(CHARING_SOURCE_AVAILABLE))
+    data = self.connection.read-data(1)
+    byte = struct.unpack("b", data)[0]
+    lock.release()
+    return byte
+
+  def read_ir_omni(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " " +str(INFRARED_OMNI))
+    data = self.connection.read_data(1)
+    byte = struct.unpack("B", data)[0]
+    lock.release()
+    return byte
+
+  def read_ir_left(self):
+    lock.acquire()
+    self.connection.send_command(str(SENSORS_OPCODE)+ " "+str(INFRARED_LEFT))
+    data = self.connection.read_data(1)
+    byte = struct.unpack('B',data)[0]
+    lock.release()
+    return byte
+
+  def read_ir_right(self):
+    lock.acquire()
+    self.connection.send_command(str(SESNORS_OPCODE)+ " "+str(INFRARED_RIGHT))
+    data = self.connection.read_data(1)
+    byte = struct.unpack('B', data)[0]
     lock.release()
     return byte
 
