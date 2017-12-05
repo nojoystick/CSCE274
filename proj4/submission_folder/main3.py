@@ -20,7 +20,7 @@ def FollowWall():
     LSPEED = 50
     RSPEED = 50
     # Case: wheel drop detected
-    elif wheelDrop:
+    if wheelDrop:
       connection.stop()
       connection.song()
       MOVING = False
@@ -61,7 +61,7 @@ def FollowWall():
 # This thread is triggered by detection of the RG or RGFIELD by the omni
 # It runs until the dock is found or charging is detected.
 #
-def FindDock()
+def FindDock():
   while 1:
     print "OMNI IS REDGREEN"
     # Read dock sensors
@@ -78,7 +78,7 @@ def FindDock()
       connection.stop()
       is_left_green = connection.is_left_green()
       is_right_red = connection.is_right_red()
-    while(!is_left_green and !is_left_red):
+    while(not is_left_green and not is_left_red):
       print "CIRCLE"
       # maybe include some randomness here to make it do more of a zigzag
       connection.drive_direct(100,30)
