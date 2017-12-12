@@ -9,3 +9,5 @@ Project 2 implemented a random walk algorithm for the robot. Once the "Clean" bu
 If the wheel drop was detected, it would play a warning song and stop until the "Clean" button was pressed again.
 
 Project 3 implemented a PD controller to follow a wall. The robot would maintain a set point using the light sensors to detect distance from the wall. If a wall approached from the front, a multiplier was used to ensure that the robot would turn quickly enough to avoid the oncoming corner. Aspects of Project 2 were maintained to handle obtsacles.
+
+Project 4 expanded on Project 3 to implement a dock finding behavior. If the dock signal was encountered while following the wall, the robot would exit the wall following behavior and begin searching for the dock. Once the dock was encountered, the robot stopped, played a song, and began charging.
